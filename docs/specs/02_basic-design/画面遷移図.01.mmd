@@ -1,0 +1,39 @@
+%%{init: {'theme':'default','themeVariables':{'fontFamily':"'Noto Sans CJK JP', sans-serif"},'flowchart':{'nodeSpacing':80,'rankSpacing':100,'padding':12}}}%%
+flowchart TB
+  S01["S01 ログイン"]
+  G(["Google のログイン画面"])
+  S02["S02 初回設定"]
+  NOTE["タブ：S03・S05・S06・S07 の間はいつでも移れる"]
+  S03["S03 ホーム"]
+  S05["S05 記録"]
+  S06["S06 グラフ<br>推移・年比較・年間"]
+  S07["S07 設定"]
+  S04["S04 検針票の入力"]
+  S08["S08 契約"]
+  TO02(["S02 初回設定へ"])
+  TO01(["S01 ログインへ"])
+
+  S01 -- "Google でログイン" --> G
+  G -- "失敗・キャンセル" --> S01
+  G -- "世帯に未所属" --> S02
+  G -- "世帯に所属済み" --> S03
+  S02 -- "参加する／世帯を作成" --> S03
+
+  NOTE ~~~ S03
+  NOTE ~~~ S05
+  NOTE ~~~ S06
+  NOTE ~~~ S07
+
+  S03 -- "作成／次を作成" --> S04
+  S05 -- "作成／編集" --> S04
+  S04 -- "保存・キャンセル" --> S05
+  S04 -. "キャンセル" .-> S03
+
+  S07 <-- "契約を登録／<br>契約の行を押す<br>（保存で戻る）" --> S08
+  S07 -- "世帯から退出（一般のみ）" --> TO02
+  S07 -- "ログアウト" --> TO01
+
+  classDef note fill:#fff8c5,stroke:#b8a200
+  classDef dest fill:#f2f2f2,stroke:#999
+  class NOTE note
+  class TO01,TO02 dest

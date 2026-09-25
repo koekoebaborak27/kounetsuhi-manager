@@ -14,7 +14,7 @@
 
 | ID | 機能 | 画面 | 要件 |
 |---|---|---|---|
-| F01 | 認証と世帯（Google ログイン、世帯の作成、招待コードでの参加） | S01 ログイン / S02 初回設定 / S07 設定 | [`01_認証と世帯/`](docs/specs/01_requirements/01_認証と世帯/README.md) |
+| F01 | 認証と世帯（Google ログイン、世帯の作成、招待コードでの参加、一般メンバーの退出） | S01 ログイン / S02 初回設定 / S07 設定 | [`01_認証と世帯/`](docs/specs/01_requirements/01_認証と世帯/README.md) |
 | F02 | 契約（会社・プラン・契約期間、請求額の内訳項目の選択） | S07 設定 / S08 契約 | [`02_契約/`](docs/specs/01_requirements/02_契約/README.md) |
 | F03 | 検針票の記録（使用月ごとの作成・編集） | S05 記録 / S04 検針票の入力 | [`03_検針票の記録/`](docs/specs/01_requirements/03_検針票の記録/README.md) |
 | F04 | ホーム（種別ごとの最新の検針票、前回比・前年同月比、今年の合計） | S03 ホーム | [`04_ホーム/`](docs/specs/01_requirements/04_ホーム/README.md) |
@@ -76,6 +76,7 @@ PR の作成・更新時と `main` への push 時に、次を順に実行しま
 | 知りたいこと | 場所 |
 |---|---|
 | 要件（全体・機能ごと） | [`docs/specs/01_requirements/`](docs/specs/01_requirements/README.md) |
+| 基本設計（画面・DB・画面遷移図。機能ごと） | [`docs/specs/02_basic-design/`](docs/specs/02_basic-design/README.md) |
 | 設計書の索引 | [`docs/specs/`](docs/specs/README.md) |
 | 画面レイアウト | [`docs/mockups/画面イメージ.html`](docs/mockups/画面イメージ.html) |
 | 残タスクと現在地 | [`docs/todo/TODO.md`](docs/todo/TODO.md) |

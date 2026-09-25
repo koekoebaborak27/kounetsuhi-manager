@@ -22,7 +22,7 @@
 
 | 区分 | 進捗 |
 | --- | --- |
-| 開発工程（次にやること 1〜7） | 2 / 7 |
+| 開発工程（次にやること 1〜7） | 3 / 7 |
 
 ## 次にやること
 
@@ -38,7 +38,7 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] HTMLひな形でのすり合わせ完了（2026-09-25）
   - [x] 画像による作り込みは行わず、ひな形のデザインで確定（2026-09-25）
   - [x] [`DESIGN.md`](../../DESIGN.md) を画面イメージに合わせて刷新（2026-09-25）→ [履歴](history/2026-09.md#2026-09-25-テンプレート由来の文書をプロジェクト用に整備)
-- [ ] 3. 基本設計（要件定義で定まっていない部分のみ。→ [`docs/specs/`](../specs/README.md)）
+- [x] **3. 基本設計**（2026-09-25）→ [`docs/specs/02_basic-design/`](../specs/02_basic-design/README.md)・[履歴](history/2026-09.md#2026-09-25-基本設計書の作成)
 - [ ] 4. 詳細設計（基本的には不要。基本設計で定まっていない部分のみ）
 - [ ] 5. 実装・単体ロジックテスト（1機能ずつ実装する。→ [`create-vitest-test`](../skills/create-vitest-test.md)）
 - [ ] 6. 画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
