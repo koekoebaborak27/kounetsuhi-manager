@@ -56,7 +56,7 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | git 未初期化 |
+| 作業ブランチ | `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
 | ローカル環境 | 未構築 |
 | 本番 | 未構築 |
 
