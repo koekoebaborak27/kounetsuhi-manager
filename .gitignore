@@ -53,3 +53,7 @@ docs/test/unit/result/*
 
 # === TypeScript ===
 *.tsbuildinfo
+
+# === Next.js ===
+.next/
+next-env.d.ts

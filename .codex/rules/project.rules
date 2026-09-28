@@ -22,8 +22,8 @@ prefix_rule(
 
 prefix_rule(pattern=["git", ["status", "diff", "log", "show", "branch"]], decision="allow")
 
-# フレームワークを導入したら次の行を有効にする（build を許可する）。
-# prefix_rule(pattern=["pnpm", "build"], decision="allow")
+# Next.js のビルドを許可する。
+prefix_rule(pattern=["pnpm", "build"], decision="allow")
 
 # Prisma を採用する場合は次の行を有効にする。
 # prefix_rule(pattern=["pnpm", "prisma:generate"], decision="allow")

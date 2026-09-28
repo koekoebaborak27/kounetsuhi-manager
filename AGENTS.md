@@ -46,7 +46,7 @@
 - **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js、ORM = Prisma、DB = PostgreSQL（本番は Supabase の無料プラン、開発は手元の Docker。`docker/docker-compose.yml`）。
 - **アーキテクチャ**: 依存方向は `app → modules → shared` の一方向のみ。詳細 → `@src/AGENTS.md`
 - **CI は GitHub Actions**（lint / format / typecheck / test）。デプロイ先は Vercel（Hobby プラン）。
-- **ローカル開発の起動方法**: 未定（Next.js を導入した時点で書く）。
+- **ローカル開発の起動方法**: `pnpm install` のあと `pnpm dev` を実行し、http://localhost:3000 を開く。
 - **認証・認可**: Better Auth による Google ログインのみ。ログインできるのは Google Cloud の OAuth 同意画面にテストユーザーとして登録した家族だけ。データは所属する世帯の分だけを扱い、世帯での絞り込みはアプリのコードで行う。
 
 ## 最小規約
@@ -70,6 +70,9 @@
 
 ```
 pnpm install        # 依存パッケージの取得
+pnpm dev            # 開発用サーバーの起動（http://localhost:3000）
+pnpm build          # 本番用にビルド
+pnpm start          # ビルド結果を起動（先に pnpm build が必要）
 pnpm lint           # ESLint
 pnpm format:check   # Prettier チェック
 pnpm typecheck      # tsc --noEmit
@@ -77,8 +80,6 @@ pnpm test           # Vitest（単体）
 pnpm test:watch     # Vitest（監視）
 docker compose -f docker/docker-compose.yml up -d db   # 開発用 DB の起動
 ```
-
-フレームワークを導入したら `dev` / `build` / `start` などをここへ追記する。
 
 ## 参照
 
