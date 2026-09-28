@@ -11,7 +11,10 @@
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git show *)",
-      "Bash(git branch)"
+      "Bash(git branch)",
+      "Bash(docker compose -f docker/docker-compose.yml up*)",
+      "Bash(docker compose -f docker/docker-compose.yml ps*)",
+      "Bash(docker compose -f docker/docker-compose.yml logs*)"
     ],
     "deny": [
       "Read(.env)",

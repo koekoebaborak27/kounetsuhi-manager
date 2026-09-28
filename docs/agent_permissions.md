@@ -11,13 +11,13 @@ Claude Code / Codex / GitHub Copilot が**確認なしで実行してよいコ�
 | 検証 | `pnpm lint` / `pnpm format:check` / `pnpm typecheck` | 読み取りのみ |
 | 検証 | `pnpm test` / `pnpm test:*` | 読み取りのみ（DB を破壊しない） |
 | Git（読み取り） | `git status` / `git diff` / `git log` / `git show` / `git branch` | 読み取りのみ |
+| DB（ローカル） | `docker compose -f docker/docker-compose.yml up` / `ps` / `logs` | 開発用 DB（Docker）の起動と状態確認。`down -v` はデータが消えるため許可しない |
 
 プロジェクトで追加したコマンドは、この表に 1 行足してから各ツールの設定へ反映する。よく足すもの:
 
 | 分類 | コマンド例 | 備考 |
 |---|---|---|
 | ビルド | `pnpm build` | フレームワークを導入したら追加する |
-| DB（ローカル） | `docker compose -f docker/docker-compose.yml up` / `ps` / `logs` | ローカル開発 DB を Docker で動かす場合。各設定ファイルにコメントで雛形を入れてある |
 | DB（生成物のみ） | `pnpm prisma:generate` | Prisma を採用する場合 |
 
 ## 禁止（エージェントが単独で実行してはならない）

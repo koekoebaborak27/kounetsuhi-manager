@@ -37,12 +37,13 @@
 | `.claude/` | Claude Code が読むスキル（`skills/<name>/SKILL.md`）+ サブエージェント（`agents/<name>.md`）+ 権限設定（`settings.json`） |
 | `.vscode/` | 推奨拡張機能 + Copilot の権限設定（`settings.json`） |
 | `prisma/` | スキーマ・マイグレーション・seed。規約は `@prisma/AGENTS.md` |
+| `docker/` | 開発用 DB（PostgreSQL）の Docker 設定（`docker-compose.yml`） |
 
 ## ポイント
 
 > ここは**プロジェクトごとに書き換える節**。決まっていないうちは「未定」と書いておき、決まった時点で 1 行足す。
 
-- **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js、ORM = Prisma、DB = PostgreSQL（Supabase の無料プラン。開発用と本番用を分けず 1 つの DB を使う）。
+- **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js、ORM = Prisma、DB = PostgreSQL（本番は Supabase の無料プラン、開発は手元の Docker。`docker/docker-compose.yml`）。
 - **アーキテクチャ**: 依存方向は `app → modules → shared` の一方向のみ。詳細 → `@src/AGENTS.md`
 - **CI は GitHub Actions**（lint / format / typecheck / test）。デプロイ先は Vercel（Hobby プラン）。
 - **ローカル開発の起動方法**: 未定（Next.js を導入した時点で書く）。
@@ -74,6 +75,7 @@ pnpm format:check   # Prettier チェック
 pnpm typecheck      # tsc --noEmit
 pnpm test           # Vitest（単体）
 pnpm test:watch     # Vitest（監視）
+docker compose -f docker/docker-compose.yml up -d db   # 開発用 DB の起動
 ```
 
 フレームワークを導入したら `dev` / `build` / `start` などをここへ追記する。

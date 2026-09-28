@@ -13,8 +13,8 @@
 
     // フレームワークを導入したら次の行を有効にする（build を許可する）。
     // "/^pnpm build\\b/": true,
-    // ローカル DB を Docker で動かす場合は次の行を有効にする。
-    // "/^docker compose -f docker\\/docker-compose\\.yml (up|ps|logs)\\b/": true,
+    // 開発用 DB（Docker）の起動と状態確認。
+    "/^docker compose -f docker\\/docker-compose\\.yml (up|ps|logs)\\b/": true,
     // Prisma を採用する場合は次の行を有効にする。
     // "/^pnpm prisma:generate\\b/": true,
 
