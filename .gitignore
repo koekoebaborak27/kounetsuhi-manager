@@ -57,3 +57,6 @@ docs/test/unit/result/*
 # === Next.js ===
 .next/
 next-env.d.ts
+
+# === Prisma の生成物（pnpm prisma:generate で作り直せる） ===
+src/shared/db/generated/

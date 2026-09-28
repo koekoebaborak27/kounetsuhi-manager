@@ -25,8 +25,8 @@ prefix_rule(pattern=["git", ["status", "diff", "log", "show", "branch"]], decisi
 # Next.js のビルドを許可する。
 prefix_rule(pattern=["pnpm", "build"], decision="allow")
 
-# Prisma を採用する場合は次の行を有効にする。
-# prefix_rule(pattern=["pnpm", "prisma:generate"], decision="allow")
+# Prisma のコード生成を許可する（生成物は src/shared/db/generated/ に閉じる）。
+prefix_rule(pattern=["pnpm", "prisma:generate"], decision="allow")
 
 # 開発用 DB（Docker）の起動と状態確認（Windows の区切り文字用に 2 つ必要）。
 prefix_rule(

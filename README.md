@@ -45,13 +45,32 @@
    pnpm install
    ```
 
-3. 開発用サーバーを起動し、ブラウザで http://localhost:3000 を開く。
+3. 環境変数のファイルを用意する。見本の `.env.example` をコピーするだけで、開発用 DB につながる。
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. 開発用 DB（Docker の PostgreSQL）を起動する。Docker Desktop が必要。
+
+   ```bash
+   docker compose -f docker/docker-compose.yml up -d db
+   ```
+
+5. DB にテーブルを作り、アプリから DB を使うためのコードを生成する。
+
+   ```bash
+   pnpm prisma:migrate
+   pnpm prisma:generate
+   ```
+
+6. 開発用サーバーを起動し、ブラウザで http://localhost:3000 を開く。
 
    ```bash
    pnpm dev
    ```
 
-いまは仮のトップページだけで、ログインやデータベースはまだつながっていません。
+いまは仮のトップページだけで、ログインはまだつながっていません。DB のテーブルはできていますが、画面からはまだ使っていません。
 
 ## よく使うコマンド
 
@@ -66,6 +85,9 @@ pnpm typecheck      # tsc --noEmit
 pnpm test           # Vitest（単体）
 pnpm test:watch     # Vitest（監視）
 pnpm test:e2e       # Playwright（画面操作）
+pnpm prisma:generate                 # Prisma のコード生成（clone 直後とスキーマ変更後）
+pnpm prisma:migrate --name <名前>    # マイグレーションの作成と開発用 DB への適用（名前は英語 snake_case）
+pnpm db:reset                        # 開発用 DB を作り直す（データは消える）
 docker compose -f docker/docker-compose.yml up -d db   # 開発用 DB の起動（要 Docker Desktop）
 ```
 
@@ -79,8 +101,11 @@ PR の作成・更新時と `main` への push 時に、次を順に実行しま
 
 1. lint
 2. format チェック
-3. typecheck
-4. test
+3. Prisma のスキーマ検査とコード生成
+4. typecheck
+5. マイグレーションの適用（CI の中だけで起動する使い捨ての PostgreSQL に対して）
+6. test
+7. build
 
 ## ドキュメント
 

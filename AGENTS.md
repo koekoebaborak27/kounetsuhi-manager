@@ -46,7 +46,7 @@
 - **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js、ORM = Prisma、DB = PostgreSQL（本番は Supabase の無料プラン、開発は手元の Docker。`docker/docker-compose.yml`）。
 - **アーキテクチャ**: 依存方向は `app → modules → shared` の一方向のみ。詳細 → `@src/AGENTS.md`
 - **CI は GitHub Actions**（lint / format / typecheck / test）。デプロイ先は Vercel（Hobby プラン）。
-- **ローカル開発の起動方法**: `pnpm install` のあと `pnpm dev` を実行し、http://localhost:3000 を開く。
+- **ローカル開発の起動方法**: `pnpm install` → `.env.example` を `.env` にコピー → `docker compose -f docker/docker-compose.yml up -d db`（開発用 DB）→ `pnpm prisma:migrate` → `pnpm prisma:generate` → `pnpm dev` の順に実行し、http://localhost:3000 を開く。手順の詳細は `README.md` の「セットアップ」。
 - **認証・認可**: Better Auth による Google ログインのみ。ログインできるのは Google Cloud の OAuth 同意画面にテストユーザーとして登録した家族だけ。データは所属する世帯の分だけを扱い、世帯での絞り込みはアプリのコードで行う。
 
 ## 最小規約
@@ -78,6 +78,10 @@ pnpm format:check   # Prettier チェック
 pnpm typecheck      # tsc --noEmit
 pnpm test           # Vitest（単体）
 pnpm test:watch     # Vitest（監視）
+pnpm test:e2e       # Playwright（画面操作）
+pnpm prisma:generate                 # Prisma のコード生成（clone 直後とスキーマ変更後）
+pnpm prisma:migrate --name <名前>    # マイグレーションの作成と開発用 DB への適用（名前は英語 snake_case）
+pnpm db:reset                        # 開発用 DB を作り直す（エージェントは実行禁止）
 docker compose -f docker/docker-compose.yml up -d db   # 開発用 DB の起動
 ```
 

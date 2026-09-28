@@ -19,21 +19,26 @@ jobs:
   verify:
     runs-on: ubuntu-latest
 
-    # DB を使うプロジェクトでは、次のブロックを有効にしてテスト用の DB を起動する。
-    # services:
-    #   postgres:
-    #     image: postgres:16
-    #     env:
-    #       POSTGRES_USER: app
-    #       POSTGRES_PASSWORD: password
-    #       POSTGRES_DB: app_db
-    #     ports:
-    #       - 5432:5432
-    #     options: >-
-    #       --health-cmd "pg_isready -U app -d app_db"
-    #       --health-interval 5s
-    #       --health-timeout 5s
-    #       --health-retries 10
+    # マイグレーションを 0 から流せるかを確かめるための、使い捨ての DB を起動する。
+    # 開発用（docker/docker-compose.yml）と同じ PostgreSQL 17・同じ接続情報にそろえる。
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: kounetsuhi_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d kounetsuhi_dev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Prisma CLI（prisma.config.ts）が読む接続先。CI には .env が無いのでここで渡す。
+    env:
+      DATABASE_URL: postgresql://app:password@localhost:5432/kounetsuhi_dev
 
     steps:
       - uses: actions/checkout@v7
@@ -57,24 +62,23 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      # Prisma を採用する場合は、型を参照する Typecheck / Test より前に Client を生成する。
-      # （pnpm ストアがキャッシュヒットすると @prisma/client の postinstall が走らず、
-      #   生成前に tsc すると型解決に失敗する）
-      # - name: Prisma validate
-      #   run: pnpm exec prisma validate
-      # - name: Prisma generate
-      #   run: pnpm exec prisma generate
+      # 型を参照する Typecheck / Test より前に、Prisma のコードを生成する。
+      # （生成物は Git に入れていないため、生成前に tsc すると型が見つからず失敗する）
+      - name: Prisma validate
+        run: pnpm exec prisma validate
+      - name: Prisma generate
+        run: pnpm prisma:generate
 
       - name: Typecheck
         run: pnpm typecheck
 
-      # DB を使う場合は、0 からスキーマを再現できることをここで検証する。
-      # - name: Apply migrations
-      #   run: pnpm exec prisma migrate deploy
+      # マイグレーションだけで 0 から DB を再現できることを確かめる。
+      - name: Apply migrations
+        run: pnpm exec prisma migrate deploy
 
       - name: Test
         run: pnpm test
 
-      # フレームワークを導入して package.json に build を追加したら、次を有効にする。
-      # - name: Build
-      #   run: pnpm build
+      # 本番用のビルドが通ることを確かめる（Prisma のコードは上で生成済み）。
+      - name: Build
+        run: pnpm build

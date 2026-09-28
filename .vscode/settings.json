@@ -15,8 +15,8 @@
     "/^pnpm build\\b/": true,
     // 開発用 DB（Docker）の起動と状態確認。
     "/^docker compose -f docker\\/docker-compose\\.yml (up|ps|logs)\\b/": true,
-    // Prisma を採用する場合は次の行を有効にする。
-    // "/^pnpm prisma:generate\\b/": true,
+    // Prisma のコード生成を許可する（生成物は src/shared/db/generated/ に閉じる）。
+    "/^pnpm prisma:generate\\b/": true,
 
     // --- 禁止（必ず人間の確認を挟む） ---
     "/^pnpm db:reset\\b/": false,

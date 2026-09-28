@@ -17,6 +17,8 @@ const config = [
       "next-env.d.ts",
       "playwright.config.ts",
       "e2e/**",
+      // Prisma が生成するコード（手で直さないため検査しない）
+      "src/shared/db/generated/**",
     ],
   },
 ];
