@@ -52,6 +52,8 @@
    cp .env.example .env
    ```
 
+   ログインを試すには、`.env` に Better Auth の秘密の値と Google の OAuth クライアントの値を入れる。手順は [`docs/development/Googleログインの準備.md`](docs/development/Googleログインの準備.md)。
+
 4. 開発用 DB（Docker の PostgreSQL）を起動する。Docker Desktop が必要。
 
    ```bash
@@ -71,7 +73,7 @@
    pnpm dev
    ```
 
-いまはタブ（ホーム・記録・グラフ・設定）で切り替えられる仮の画面だけで、ログインはまだつながっていません。DB のテーブルはできていますが、画面からはまだ使っていません。
+開くとログイン画面へ移ります。Google でログインすると、世帯に入っていない人は初回設定の画面（まだ仮のページ）へ移ります。世帯の作成・参加と設定の画面は、これから作ります。
 
 ## よく使うコマンド
 
@@ -119,6 +121,7 @@ PR の作成・更新時と `main` への push 時に、次を順に実行しま
 | 残タスクと現在地 | [`docs/todo/TODO.md`](docs/todo/TODO.md) |
 | 作業の経緯 | [`docs/todo/history/`](docs/todo/history/README.md) |
 | 開発フロー（ブランチ → PR → CI → マージ） | [`docs/development/gitの操作ルール.md`](docs/development/gitの操作ルール.md) |
+| 手元で Google ログインを試す準備 | [`docs/development/Googleログインの準備.md`](docs/development/Googleログインの準備.md) |
 | UI / デザイン規約 | [`DESIGN.md`](DESIGN.md) |
 | レビュー観点 / テスト方針 | [`REVIEW.md`](REVIEW.md) / [`TESTING.md`](TESTING.md) |
 | DB（Prisma）の操作 | [`docs/prisma_operations.md`](docs/prisma_operations.md) |
