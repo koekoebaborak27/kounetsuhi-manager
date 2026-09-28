@@ -44,7 +44,10 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] 5-1. Next.js を導入し、ローカルでの起動方法を [`AGENTS.md`](../../AGENTS.md)・[`README.md`](../../README.md) に書く（2026-09-28）→ [履歴](history/2026-09.md#2026-09-28-nextjsを導入して仮のトップページを表示)
   - [x] 5-2. Prisma を導入し、各機能の `01_データベース.md` からスキーマを書いて、開発用 DB に最初のマイグレーションを流す（2026-09-28。Better Auth の Session・Account・Verification は 5-4 で作る）→ [履歴](history/2026-09.md#2026-09-28-prismaを導入して最初のマイグレーションを適用)
   - [x] 5-3. `src/shared/`（Prisma のクライアント・`AppError`・処理の入口を包む仕組み）を作る（2026-09-28。ジョブ用は作らず[残っているタスク](#残っているタスク)へ）→ [履歴](history/2026-09.md#2026-09-28-共通部品のdb接続とエラーと入口のラッパーを作成)
-  - [ ] 5-4. 認証と世帯（Better Auth による Google ログイン）→ [`01_認証と世帯`](../specs/02_basic-design/01_認証と世帯/README.md)
+  - [ ] 5-4. 認証と世帯（Better Auth による Google ログイン）→ [`01_認証と世帯`](../specs/02_basic-design/01_認証と世帯/README.md)。PR を 3 つに分ける
+    - [x] ① 画面の土台（Tailwind CSS v4・shadcn/ui・タブの枠）（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-画面の土台のtailwindとshadcnとタブの枠を作成)
+    - [ ] ② 認証（Better Auth・Session などのテーブル・画面の振り分け・S01 ログイン・ログアウト）
+    - [ ] ③ 世帯（S02 初回設定・S07 設定）
   - [ ] 5-5. 契約 → [`02_契約`](../specs/02_basic-design/02_契約/README.md)
   - [ ] 5-6. 検針票の記録 → [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)
   - [ ] 5-7. ホーム → [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)
@@ -64,8 +67,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `feature/setup-shared`（5-3。未コミット・PR 未作成）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（仮のトップページ 1 枚）と Prisma 7.10。開発用 DB にはマイグレーション `init`（Better Auth の Session・Account・Verification を除く 8 テーブル）と `add_table_column_comments`（テーブル・列の論理名と説明のコメント）を適用済み。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。`src/shared/` に Prisma のクライアント（`db/client.ts`）・`AppError`（`errors/app-error.ts`）・画面操作用と API 用の入口ラッパー（`observability/`）がある。Better Auth は未導入 |
+| 作業ブランチ | `feature/ui-foundation`（5-4 ①）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える仮の画面 4 枚。Tailwind CSS v4・shadcn/ui）と Prisma 7.10。開発用 DB にはマイグレーション `init`（Better Auth の Session・Account・Verification を除く 8 テーブル）と `add_table_column_comments`（テーブル・列の論理名と説明のコメント）を適用済み。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。`src/shared/` に Prisma のクライアント（`db/client.ts`）・`AppError`（`errors/app-error.ts`）・画面操作用と API 用の入口ラッパー（`observability/`）がある。Better Auth は未導入 |
 | 本番 | 未構築 |
 
 ## 完了済みの作業

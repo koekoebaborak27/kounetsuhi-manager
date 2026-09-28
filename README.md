@@ -28,6 +28,7 @@
 |---|---|
 | 言語 | TypeScript / Node.js（[`.nvmrc`](.nvmrc) のバージョン） |
 | フレームワーク | Next.js（App Router） |
+| 画面の部品 | Tailwind CSS v4 + shadcn/ui（決まりは [`DESIGN.md`](DESIGN.md)） |
 | DB | PostgreSQL + Prisma。本番は Supabase の無料プラン、開発は手元の Docker（[`docker/docker-compose.yml`](docker/docker-compose.yml)） |
 | 認証 | Better Auth（Google ログインのみ） |
 | デプロイ先 | Vercel（Hobby プラン） |
@@ -70,7 +71,7 @@
    pnpm dev
    ```
 
-いまは仮のトップページだけで、ログインはまだつながっていません。DB のテーブルはできていますが、画面からはまだ使っていません。
+いまはタブ（ホーム・記録・グラフ・設定）で切り替えられる仮の画面だけで、ログインはまだつながっていません。DB のテーブルはできていますが、画面からはまだ使っていません。
 
 ## よく使うコマンド
 

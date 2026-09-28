@@ -43,7 +43,7 @@
 
 > ここは**プロジェクトごとに書き換える節**。決まっていないうちは「未定」と書いておき、決まった時点で 1 行足す。
 
-- **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js、ORM = Prisma、DB = PostgreSQL（本番は Supabase の無料プラン、開発は手元の Docker。`docker/docker-compose.yml`）。
+- **技術スタック**: 言語 = TypeScript / Node.js（`.nvmrc` のバージョン）、パッケージマネージャ = pnpm、テスト = Vitest（単体）+ Playwright（画面）。フロントエンド・バックエンド = Next.js（画面の部品は Tailwind CSS v4 + shadcn/ui）、ORM = Prisma、DB = PostgreSQL（本番は Supabase の無料プラン、開発は手元の Docker。`docker/docker-compose.yml`）。
 - **アーキテクチャ**: 依存方向は `app → modules → shared` の一方向のみ。詳細 → `@src/AGENTS.md`
 - **CI は GitHub Actions**（lint / format / typecheck / test）。デプロイ先は Vercel（Hobby プラン）。
 - **ローカル開発の起動方法**: `pnpm install` → `.env.example` を `.env` にコピー → `docker compose -f docker/docker-compose.yml up -d db`（開発用 DB）→ `pnpm prisma:migrate` → `pnpm prisma:generate` → `pnpm dev` の順に実行し、http://localhost:3000 を開く。手順の詳細は `README.md` の「セットアップ」。
