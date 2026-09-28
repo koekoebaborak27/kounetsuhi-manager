@@ -68,7 +68,7 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `feature/household`（5-4 ③）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| 作業ブランチ | `main`（5-4 まで完了。5-5 はまだ始めていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
 | ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える仮の画面 4 枚。Tailwind CSS v4・shadcn/ui）と Prisma 7.10。開発用 DB にはマイグレーション `init`（8 テーブル）・`add_table_column_comments`（テーブル・列の論理名と説明のコメント）・`add_better_auth_tables`（Session・Account・Verification とそのコメント）を適用済み。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。`src/shared/` に Prisma のクライアント（`db/client.ts`）・`AppError`（`errors/app-error.ts`）・画面操作用と API 用の入口ラッパー（`observability/`）がある。Better Auth 1.7.6 で Google ログイン（`/login`）と画面の振り分け（`src/proxy.ts`）が動く。S02 初回設定（`/setup`）で世帯の作成と招待コードでの参加が、S07 設定（`/settings`）で世帯名の変更・メンバーの一覧・招待コードの発行とコピー・世帯からの退出・ログアウトができる（契約の区画は「準備中です。」）。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
