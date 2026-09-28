@@ -6,9 +6,9 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/shared/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
+import { showActionError } from "@/shared/ui/show-action-error";
 import { renameHouseholdAction } from "../actions";
 import { householdNameFormSchema } from "../validation";
-import { showActionError } from "./show-action-error";
 
 // 「世帯名」の区画。name は今の世帯名。
 export function HouseholdNameSection({ name }: { name: string }) {
@@ -37,7 +37,7 @@ export function HouseholdNameSection({ name }: { name: string }) {
       if (result.ok) {
         setEditing(false);
       } else {
-        showActionError(result, form, "name");
+        showActionError(result, form, "name", ["VALIDATION_ERROR"]);
       }
     });
   });

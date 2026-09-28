@@ -49,7 +49,7 @@ git status --porcelain   # 未コミット差分がないか確認
     - [x] ② 認証（Better Auth・Session などのテーブル・画面の振り分け・S01 ログイン・ログアウト）（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-better-authでgoogleログインと画面の振り分けを作成)
     - [x] ③ 世帯（S02 初回設定・S07 設定）（2026-09-28。S07 の契約の区画は 5-5 で作る）→ [履歴](history/2026-09-w4.md#2026-09-28-世帯のs02初回設定とs07設定を作成)
   - [ ] 5-5. 契約 → [`02_契約`](../specs/02_basic-design/02_契約/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
-    - [ ] ① S07 の契約一覧と、S08 の契約の項目（種別・会社名・プラン名・期間・メモ）の登録・編集
+    - [x] ① S07 の契約一覧と、S08 の契約の項目（種別・会社名・プラン名・期間・メモ）の登録・編集（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)
     - [ ] ② S08 の内訳項目（候補から追加・その他・外す・並べ替え・ひな形・種別を変えるときの確認）
   - [ ] 5-6. 検針票の記録 → [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)
   - [ ] 5-7. ホーム → [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)
@@ -63,6 +63,7 @@ git status --porcelain   # 未コミット差分がないか確認
 
 - [ ] 招待コードで参加するときのトランザクションと同時参加を、DB を使う統合テスト（`*.int.test.ts`）で確かめる。開発用 DB を消さないためのテスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加が要るため、5-4 では作らず単体テストで分岐だけを確かめた → [履歴](history/2026-09-w4.md#2026-09-28-世帯のs02初回設定とs07設定を作成)
 - [ ] ジョブ用の入口ラッパー（`src/shared/observability`）を作る。定期処理は Vercel Cron が API を呼ぶ形で API 用ラッパーで足りるため、ジョブの仕組みを使う場面が出たときに作る → [履歴](history/2026-09.md#2026-09-28-共通部品のdb接続とエラーと入口のラッパーを作成)
+- [ ] 契約の保存で、検針票の有無による種別変更の可否を DB を使う統合テスト（`*.int.test.ts`）で確かめる。テスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加を決めてから作る → [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)
 
 ## 現在の状態
 
@@ -70,8 +71,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `main`（5-4 まで完了。5-5 はまだ始めていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える仮の画面 4 枚。Tailwind CSS v4・shadcn/ui）と Prisma 7.10。開発用 DB にはマイグレーション `init`（8 テーブル）・`add_table_column_comments`（テーブル・列の論理名と説明のコメント）・`add_better_auth_tables`（Session・Account・Verification とそのコメント）を適用済み。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。`src/shared/` に Prisma のクライアント（`db/client.ts`）・`AppError`（`errors/app-error.ts`）・画面操作用と API 用の入口ラッパー（`observability/`）がある。Better Auth 1.7.6 で Google ログイン（`/login`）と画面の振り分け（`src/proxy.ts`）が動く。S02 初回設定（`/setup`）で世帯の作成と招待コードでの参加が、S07 設定（`/settings`）で世帯名の変更・メンバーの一覧・招待コードの発行とコピー・世帯からの退出・ログアウトができる（契約の区画は「準備中です。」）。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
+| 作業ブランチ | `feature/contract`（5-5 の①を実装済み、未コミット）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目を登録・編集・削除できる。検針票がある契約は削除できない。内訳項目は準備中。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
 ## 完了済みの作業
