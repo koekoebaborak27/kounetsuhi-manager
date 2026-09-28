@@ -1,0 +1,105 @@
+/*
+ * アプリ全体の CSS。Tailwind CSS v4 を読み込み、色などの設定値（デザイントークン）を定義する。
+ * 値の意味と使い分けは DESIGN.md の「2. デザイントークン」が正本。値を変えるときは DESIGN.md も直す。
+ */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * 色などの設定値。画面イメージ（docs/mockups/画面イメージ.html）で使った初期値。
+ * destructive は入力チェックのエラー表示（文言・入力欄の枠）にだけ使う。削除の機能は作らないため、削除ボタンには使わない（DESIGN.md）。
+ */
+:root {
+  --radius: 0.5rem;
+
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --popover: #ffffff;
+  --popover-foreground: #222222;
+  --primary: #1a5fd0;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #555555;
+  --secondary-border: #888888;
+  --muted: #f0f0f0;
+  /* 画面イメージでは #999999 だったが、本文とのコントラスト比 4.5:1 を満たすよう濃くしている。 */
+  --muted-foreground: #6b6b6b;
+  --accent: #e3ecfb;
+  --accent-foreground: #1a5fd0;
+  --border: #cccccc;
+  --input: #aaaaaa;
+  --ring: #1a5fd0;
+  --sidebar: #f5f6f8;
+  --sidebar-foreground: #555555;
+  --highlight: #e8f0fd;
+  --highlight-border: #1a5fd0;
+  --highlight-foreground: #1a3f7a;
+  --warning: #fff1e6;
+  --warning-border: #e08a3c;
+  --warning-foreground: #a4520f;
+  --increase: #cc3333;
+  --decrease: #2563c9;
+  /* 増えたときの色（increase）と同じ値。 */
+  --destructive: #cc3333;
+  --elec: #f2b53b;
+  --gas: #e3643b;
+  --water: #3b8fe3;
+}
+
+/*
+ * 上の値を Tailwind のクラス（bg-primary・text-muted-foreground など）から使えるようにする。
+ * フォントは layout.tsx で next/font が作る変数を使う。
+ */
+@theme inline {
+  --font-sans: var(--font-noto-sans-jp), system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-border: var(--secondary-border);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-border: var(--highlight-border);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-warning: var(--warning);
+  --color-warning-border: var(--warning-border);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-increase: var(--increase);
+  --color-decrease: var(--decrease);
+  --color-destructive: var(--destructive);
+  --color-elec: var(--elec);
+  --color-gas: var(--gas);
+  --color-water: var(--water);
+}
+
+/* 枠線の色の既定値と、画面全体の地の色・文字の色。 */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}

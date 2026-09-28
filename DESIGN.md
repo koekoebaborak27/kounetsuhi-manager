@@ -42,12 +42,13 @@
 | `warning` / `warning-foreground` | 保存は止めない警告（内訳の合計の不一致・契約期間の重なり） | `#fff1e6`（枠線 `#e08a3c`）/ `#a4520f` |
 | `increase` | 前回比・前年同月比などが増えたとき | `#cc3333` |
 | `decrease` | 同じく減ったとき | `#2563c9` |
+| `destructive` | 入力チェックのエラー（入力欄の下の文言・入力欄の枠） | `#cc3333`（`increase` と同じ値） |
 | `elec` / `gas` / `water` | 種別の色（グラフの棒・折れ線、種別名の横の色見本） | `#f2b53b` / `#e3643b` / `#3b8fe3` |
 
 - `muted-foreground` は、画面イメージでは薄い灰色（`#999999`）でしたが、本文とのコントラスト比 4.5:1 を満たすよう `#6b6b6b` にしています。
 - 種別の色は面や線に使い、**文字色には使わない**（黄色・水色は白地で読みにくいため）。
 - 増減の色は必ず「+15.1%」「−5.5%」のように符号と一緒に使う（§5）。
-- 削除の機能を作らないため、`destructive` は定義しない。
+- `destructive` はエラー表示にだけ使う。削除の機能を作らないため、削除ボタン（Button の `destructive` の見た目）には使わない。
 
 ### タイポグラフィ
 
@@ -155,7 +156,10 @@
 ### コンポーネントの追加・配置
 
 - 新しい UI 部品は公式 CLI で追加する：`pnpm dlx shadcn@latest add <name>`（`components.json` に従う）。
+  - **追加した後に必ず 3 点を直す。** (1) CLI が `cn` という無関係な npm パッケージを `package.json` に足し、部品の中を `import { cn } from "cn"` にしてしまうため、`pnpm remove cn` を実行し、import 先を `@/shared/ui/utils` に直す。(2) 影（`shadow-*`）と、Button の `destructive` の見た目（削除ボタン用）を消す。(3) AGENTS.md の規約どおり、各部品の直前に何をするものかのコメントを書き、`pnpm format` で整形する。
+  - `sonner`（トースト）は CLI で追加しない。CLI 版はダークモード用の `next-themes` を使うため、`src/shared/ui/toaster.tsx` を自前で置いている。
 - 汎用の部品は `src/shared/ui`、**機能専用**の部品は各モジュールの `src/modules/<機能>/ui/` に置く。
+- 画面の URL は S01 `/login`・S02 `/setup`・S03 `/`・S05 `/records`・S06 `/graphs`・S07 `/settings`。タブのある画面は `src/app/(main)/` に置き、共通の枠（`(main)/layout.tsx` と `src/shared/ui/tab-nav.tsx`）に入れる。各画面の一番上には `PageTitle`（`src/shared/ui/page-title.tsx`）を置く。
 - クラスの結合は `cn()`（`@/shared/ui/utils`、clsx + tailwind-merge）を使う。
 - アイコンは `lucide-react`（既定 `size-4` = 16px）、トースト通知は `sonner`（`@/shared/ui/toaster`）。
 - 種別の色見本・増減の表示・使用月の表示（「6月分」「5-6月分」）は、画面ごとに作らず `src/shared/ui` の共通部品にする。
