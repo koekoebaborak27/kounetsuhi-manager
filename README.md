@@ -28,7 +28,7 @@
 |---|---|
 | 言語 | TypeScript / Node.js（[`.nvmrc`](.nvmrc) のバージョン） |
 | フレームワーク | Next.js（未導入） |
-| DB | PostgreSQL（Supabase の無料プラン）+ Prisma。開発用と本番用を分けず、1 つの DB を使う |
+| DB | PostgreSQL + Prisma。本番は Supabase の無料プラン、開発は手元の Docker（[`docker/docker-compose.yml`](docker/docker-compose.yml)） |
 | 認証 | Better Auth（Google ログインのみ） |
 | デプロイ先 | Vercel（Hobby プラン） |
 | テスト | Vitest（単体）+ Playwright（画面操作） |
@@ -56,6 +56,7 @@ pnpm typecheck      # tsc --noEmit
 pnpm test           # Vitest（単体）
 pnpm test:watch     # Vitest（監視）
 pnpm test:e2e       # Playwright（画面操作）
+docker compose -f docker/docker-compose.yml up -d db   # 開発用 DB の起動（要 Docker Desktop）
 ```
 
 ## 本番デプロイ

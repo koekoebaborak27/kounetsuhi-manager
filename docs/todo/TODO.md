@@ -57,7 +57,7 @@ git status --porcelain   # 未コミット差分がないか確認
 | 項目 | 状態 |
 | --- | --- |
 | 作業ブランチ | `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 未構築 |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）のみ構築済み。起動は `docker compose -f docker/docker-compose.yml up -d db`。Next.js は未導入 |
 | 本番 | 未構築 |
 
 ## 完了済みの作業

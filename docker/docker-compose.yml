@@ -1,0 +1,32 @@
+# 開発用の PostgreSQL を手元の Docker で動かす。
+# 本番は Supabase を使い、開発中のテストデータが本番へ混ざらないよう、開発ではこちらにつなぐ。
+# 起動: docker compose -f docker/docker-compose.yml up -d db
+# 接続文字列は .env.example の DATABASE_URL と合わせてある。
+# 置き場所のフォルダ名（docker）から名前が決まると他のプロジェクトとデータの保存場所がぶつかるため、名前を固定する。
+name: kounetsuhi-manager
+
+services:
+  db:
+    # 本番の Supabase と同じ系統（PostgreSQL 17）にそろえ、手元と本番で動きが変わらないようにする。
+    image: postgres:17-alpine
+    container_name: kounetsuhi-db
+    environment:
+      # 開発専用の値。本番の接続情報はここに書かない。
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kounetsuhi_dev
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      # コンテナを作り直してもデータが残るよう、名前付きの保存場所に置く。
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # 接続を受け付けられる状態になったかを確かめる。
+      test: ["CMD-SHELL", "pg_isready -U app -d kounetsuhi_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
