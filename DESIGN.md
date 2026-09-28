@@ -160,7 +160,7 @@
   - 追加する部品が既存の部品（`button` など）を使うとき、CLI は上書きするかを対話で聞いて止まる。既存の部品を残すため、`yes n | pnpm dlx shadcn@latest add <name> -y` のように「上書きしない」を流し込む。
   - `sonner`（トースト）は CLI で追加しない。CLI 版はダークモード用の `next-themes` を使うため、`src/shared/ui/toaster.tsx` を自前で置いている。
 - 汎用の部品は `src/shared/ui`、**機能専用**の部品は各モジュールの `src/modules/<機能>/ui/` に置く。
-- 画面の URL は S01 `/login`・S02 `/setup`・S03 `/`・S05 `/records`・S06 `/graphs`・S07 `/settings`。タブのある画面は `src/app/(main)/` に置き、共通の枠（`(main)/layout.tsx` と `src/shared/ui/tab-nav.tsx`）に入れる。各画面の一番上には `PageTitle`（`src/shared/ui/page-title.tsx`）を置く。
+- 画面の URL は S01 `/login`・S02 `/setup`・S03 `/`・S05 `/records`・S06 `/graphs`・S07 `/settings`・S08（登録）`/settings/contracts/new`・S08（編集）`/settings/contracts/[id]`。タブのある画面は `src/app/(main)/` に置き、共通の枠（`(main)/layout.tsx` と `src/shared/ui/tab-nav.tsx`）に入れる。各画面の一番上には `PageTitle`（`src/shared/ui/page-title.tsx`）を置く。
 - クラスの結合は `cn()`（`@/shared/ui/utils`、clsx + tailwind-merge）を使う。
 - アイコンは `lucide-react`（既定 `size-4` = 16px）、トースト通知は `sonner`（`@/shared/ui/toaster`）。
 - 種別の色見本・増減の表示・使用月の表示（「6月分」「5-6月分」）は、画面ごとに作らず `src/shared/ui` の共通部品にする。

@@ -7,6 +7,7 @@ import {
   MemberList,
   requireMembership,
 } from "@/modules/household";
+import { ContractListSection, getContractList } from "@/modules/contract";
 import { PageTitle } from "@/shared/ui/page-title";
 
 // S07 設定の画面（/settings）。所属している世帯のデータを読み、各区画を並べる。
@@ -15,6 +16,7 @@ export default async function Page() {
   // ログイン中の人の所属を確かめ、その世帯のデータだけを読む。
   const membership = await requireMembership();
   const settings = await getHouseholdSettings(membership);
+  const contracts = await getContractList(membership);
 
   return (
     <>
@@ -26,13 +28,7 @@ export default async function Page() {
             <MemberList members={settings.members} />
             <InvitationSection invitations={settings.invitations} />
           </div>
-          {/* 契約の区画。F02（TODO の 5-5）で契約の一覧に置き換える。 */}
-          <section aria-labelledby="contract-heading" className="flex flex-col gap-2">
-            <h2 id="contract-heading" className="text-sm font-bold">
-              契約
-            </h2>
-            <p className="text-sm text-muted-foreground">準備中です。</p>
-          </section>
+          <ContractListSection contracts={contracts} />
         </div>
         <div className="flex flex-wrap gap-3">
           {/* オーナーは退出できないので、一般のメンバーにだけ「世帯から退出」を出す。 */}

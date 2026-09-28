@@ -220,7 +220,7 @@ enum ItemCategory {
   OTHER
 }
 
-/// 契約。行を消す操作は設けない。
+/// 契約。検針票が 1 件も無い場合だけ、利用者が行を消せる。
 model Contract {
   /// cuid
   id          String      @id @default(cuid())

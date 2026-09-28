@@ -15,7 +15,7 @@ import {
   type HouseholdNameInput,
   type JoinHouseholdInput,
 } from "../validation";
-import { showActionError } from "./show-action-error";
+import { showActionError } from "@/shared/ui/show-action-error";
 
 // S02 初回設定の画面。
 export function SetupScreen() {
@@ -38,7 +38,12 @@ export function SetupScreen() {
   const handleJoin = joinForm.handleSubmit((values) => {
     startTransition(async () => {
       const result = await joinHouseholdAction({ inviteCode: values.inviteCode });
-      showActionError(result, joinForm, "inviteCode");
+      showActionError(result, joinForm, "inviteCode", [
+        "VALIDATION_ERROR",
+        "INVITATION_NOT_FOUND",
+        "INVITATION_USED",
+        "INVITATION_EXPIRED",
+      ]);
     });
   });
 
@@ -46,7 +51,7 @@ export function SetupScreen() {
   const handleCreate = createForm.handleSubmit((values) => {
     startTransition(async () => {
       const result = await createHouseholdAction({ name: values.name });
-      showActionError(result, createForm, "name");
+      showActionError(result, createForm, "name", ["VALIDATION_ERROR"]);
     });
   });
 
