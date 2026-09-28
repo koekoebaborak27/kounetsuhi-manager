@@ -27,7 +27,7 @@
 | 項目 | 内容 |
 |---|---|
 | 言語 | TypeScript / Node.js（[`.nvmrc`](.nvmrc) のバージョン） |
-| フレームワーク | Next.js（未導入） |
+| フレームワーク | Next.js（App Router） |
 | DB | PostgreSQL + Prisma。本番は Supabase の無料プラン、開発は手元の Docker（[`docker/docker-compose.yml`](docker/docker-compose.yml)） |
 | 認証 | Better Auth（Google ログインのみ） |
 | デプロイ先 | Vercel（Hobby プラン） |
@@ -38,18 +38,28 @@
 
 ## セットアップ
 
-Next.js を導入していないため、アプリを起動する手順はまだありません。導入した時点でここに書きます。
+1. Node.js（[`.nvmrc`](.nvmrc) のバージョン）と pnpm を用意する。
+2. 依存パッケージを取得する。
 
-いまの時点で動かせるのは、静的チェックと単体テストだけです。
+   ```bash
+   pnpm install
+   ```
 
-```bash
-pnpm install && pnpm lint && pnpm typecheck && pnpm test
-```
+3. 開発用サーバーを起動し、ブラウザで http://localhost:3000 を開く。
+
+   ```bash
+   pnpm dev
+   ```
+
+いまは仮のトップページだけで、ログインやデータベースはまだつながっていません。
 
 ## よく使うコマンド
 
 ```
 pnpm install        # 依存パッケージの取得
+pnpm dev            # 開発用サーバーの起動（http://localhost:3000）
+pnpm build          # 本番用にビルド
+pnpm start          # ビルド結果を起動（先に pnpm build が必要）
 pnpm lint           # ESLint
 pnpm format:check   # Prettier チェック
 pnpm typecheck      # tsc --noEmit

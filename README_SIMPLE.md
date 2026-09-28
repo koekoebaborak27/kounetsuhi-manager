@@ -17,12 +17,13 @@
 
 ```
 pnpm install        # 必要な部品をそろえる
+pnpm dev            # アプリを起動する（http://localhost:3000）
 pnpm lint           # 書き方のチェック
 pnpm typecheck      # 型のチェック
 pnpm test           # テストの実行
 ```
 
-アプリを起動する手順は、アプリ本体を作り始めた時点で [`README.md`](README.md) の「セットアップ」に書きます。
+起動の手順は [`README.md`](README.md) の「セットアップ」を見てください。
 
 ## AIエージェントで開発する
 

@@ -10,6 +10,7 @@ Claude Code / Codex / GitHub Copilot が**確認なしで実行してよいコ�
 | 依存 | `pnpm install` | ネットワークアクセスを伴うが、副作用は `node_modules/` に閉じる |
 | 検証 | `pnpm lint` / `pnpm format:check` / `pnpm typecheck` | 読み取りのみ |
 | 検証 | `pnpm test` / `pnpm test:*` | 読み取りのみ（DB を破壊しない） |
+| ビルド | `pnpm build` | 生成物は `.next/` に閉じる |
 | Git（読み取り） | `git status` / `git diff` / `git log` / `git show` / `git branch` | 読み取りのみ |
 | DB（ローカル） | `docker compose -f docker/docker-compose.yml up` / `ps` / `logs` | 開発用 DB（Docker）の起動と状態確認。`down -v` はデータが消えるため許可しない |
 
@@ -17,7 +18,6 @@ Claude Code / Codex / GitHub Copilot が**確認なしで実行してよいコ�
 
 | 分類 | コマンド例 | 備考 |
 |---|---|---|
-| ビルド | `pnpm build` | フレームワークを導入したら追加する |
 | DB（生成物のみ） | `pnpm prisma:generate` | Prisma を採用する場合 |
 
 ## 禁止（エージェントが単独で実行してはならない）
