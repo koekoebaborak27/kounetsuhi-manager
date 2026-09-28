@@ -16,7 +16,8 @@ datasource db {
 
 // ---------------------------------------------------------------------------
 // F01 認証と世帯
-// Session・Account・Verification は 5-4 で Better Auth の CLI に作らせる。
+// Session・Account・Verification は Better Auth の CLI（pnpm dlx auth generate）が出した列をそのまま使う。
+// ただし、テーブル名を変える @@map は付けず、日時は他のテーブルと同じ timestamptz にしている。
 // ---------------------------------------------------------------------------
 
 /// 世帯での役割。
@@ -47,6 +48,8 @@ model User {
   membership         Membership?
   createdInvitations Invitation[] @relation("InvitationCreatedBy")
   usedInvitations    Invitation[] @relation("InvitationUsedBy")
+  sessions           Session[]
+  accounts           Account[]
 }
 
 /// 世帯。
@@ -109,6 +112,82 @@ model Invitation {
 
   // 設定画面で、世帯の使えるコードを一覧にするため。
   @@index([householdId, expiresAt])
+}
+
+/// ログイン状態。ログインしているブラウザごとに 1 行。Better Auth が作る。
+model Session {
+  /// Better Auth が作る ID
+  id        String   @id
+  /// この日時を過ぎるとログアウトした扱いになる
+  expiresAt DateTime @db.Timestamptz(3)
+  /// ブラウザのクッキーに入れる、ログイン状態を見分けるための値
+  token     String   @unique
+  /// 作成日時
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  /// ログインしたときの接続元
+  ipAddress String?
+  /// ログインしたときのブラウザの種類
+  userAgent String?
+  /// User.id への参照
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// 外部アカウント。Google アカウントとの結び付き。Better Auth が作る。
+model Account {
+  /// Better Auth が作る ID
+  id                    String    @id
+  /// Google 側の利用者の ID
+  accountId             String
+  /// ログインに使ったサービスの名前（google）
+  providerId            String
+  /// User.id への参照
+  userId                String
+  /// Google から受け取った値。アプリでは使わない
+  accessToken           String?
+  /// Google から受け取った値。アプリでは使わない
+  refreshToken          String?
+  /// Google から受け取った本人確認の値
+  idToken               String?
+  /// アクセストークンの有効期限
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  /// リフレッシュトークンの有効期限
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  /// Google に求めた情報の範囲（openid・email・profile）
+  scope                 String?
+  /// メールアドレスとパスワードでのログイン用。Google ログインだけなので使わない（常に空）
+  password              String?
+  /// 作成日時
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// 確認用の一時データ。ログインの途中で使う一時的な値（Google から戻ってきたときの照合用など）。Better Auth が作る。
+model Verification {
+  /// Better Auth が作る ID
+  id         String   @id
+  /// 何のための値かを見分けるキー
+  identifier String
+  /// 保存する値
+  value      String
+  /// この日時を過ぎた値は使えない
+  expiresAt  DateTime @db.Timestamptz(3)
+  /// 作成日時
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
 }
 
 // ---------------------------------------------------------------------------
