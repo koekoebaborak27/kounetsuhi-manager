@@ -7,7 +7,7 @@
 
 /*
  * 色などの設定値。画面イメージ（docs/mockups/画面イメージ.html）で使った初期値。
- * destructive は入力チェックのエラー表示（文言・入力欄の枠）にだけ使う。削除の機能は作らないため、削除ボタンには使わない（DESIGN.md）。
+ * destructive は入力チェックのエラー表示（文言・入力欄の枠）と、取り消せない削除のボタンにだけ使う（DESIGN.md）。
  */
 :root {
   --radius: 0.5rem;
@@ -43,6 +43,8 @@
   --decrease: #2563c9;
   /* 増えたときの色（increase）と同じ値。 */
   --destructive: #cc3333;
+  /* 削除のボタン（destructive の塗り）の上の文字。赤の塗りとのコントラスト比は約 5:1 で、4.5:1 以上ある。 */
+  --destructive-foreground: #ffffff;
   --elec: #f2b53b;
   --gas: #e3643b;
   --water: #3b8fe3;
@@ -89,6 +91,7 @@
   --color-increase: var(--increase);
   --color-decrease: var(--decrease);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-elec: var(--elec);
   --color-gas: var(--gas);
   --color-water: var(--water);

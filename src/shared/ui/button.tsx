@@ -5,13 +5,15 @@ import { cn } from "@/shared/ui/utils";
 import { Slot } from "radix-ui";
 
 // ボタンの見た目の種類ごとのクラス。
-// default = 主要な操作（保存・作成など）、secondary = 補助の操作（キャンセル・編集・ログアウト）。
+// default = 主要な操作（保存・作成など）、secondary = 補助の操作（キャンセル・編集・ログアウト）、
+// destructive = 取り消せない削除の操作（契約の削除など）。
 const buttonVariants = cva(
   "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
           "border bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:

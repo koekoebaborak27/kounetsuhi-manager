@@ -1,6 +1,7 @@
 "use client";
 // S08 の契約フォーム。入力チェック・重なりの警告・保存中の状態を画面で管理する。
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, X } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
@@ -31,6 +32,9 @@ import { showActionError } from "@/shared/ui/show-action-error";
 import { Textarea } from "@/shared/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
 import { UTILITY_TYPES, UTILITY_TYPE_LABELS } from "@/shared/ui/utility-dot";
+
+// 「キャンセル」で戻る設定の画面（S07）の URL。
+const SETTINGS_PATH = "/settings";
 
 // 必須項目のラベルに付ける印。文字色を薄くして、エラー表示と区別する。
 function RequiredLabel({ children }: { children: string }) {
@@ -105,6 +109,8 @@ export function ContractForm({
   currentYear: number;
 }) {
   const [pending, startTransition] = useTransition();
+  // 「キャンセル」で設定の画面へ戻るために使う。
+  const router = useRouter();
   // 新規登録では未選択を空文字で持ち、スキーマで保存時に必須として確かめる。
   const defaultUtilityType = data.contract?.utilityType ?? ("" as const);
   const form = useForm({
@@ -290,14 +296,19 @@ export function ContractForm({
             <p className="text-sm text-muted-foreground">準備中です。</p>
           </section>
         </div>
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+        {/* ボタンの並び。スマホでは上から「保存」「契約を削除」「キャンセル」を幅いっぱいに縦に並べる。
+            PC では左端に「契約を削除」、右下に「キャンセル」「保存」を同じ幅で横に並べる。 */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
+          <Button type="submit" disabled={pending} className="w-full lg:order-3 lg:w-40">
+            保存
+          </Button>
           {data.id && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 lg:order-1 lg:mr-auto">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="destructive"
                     disabled={pending || data.hasMeterReadings}
                   >
                     契約を削除
@@ -314,7 +325,12 @@ export function ContractForm({
                     <AlertDialogCancel type="button" disabled={pending}>
                       キャンセル
                     </AlertDialogCancel>
-                    <AlertDialogAction type="button" disabled={pending} onClick={handleDelete}>
+                    <AlertDialogAction
+                      type="button"
+                      variant="destructive"
+                      disabled={pending}
+                      onClick={handleDelete}
+                    >
                       削除する
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -327,8 +343,16 @@ export function ContractForm({
               )}
             </div>
           )}
-          <Button type="submit" disabled={pending} className="w-full lg:w-40">
-            保存
+          {/* 保存せずに設定の画面へ戻る。設計書どおり、入力内容が失われる確認は出さない。
+              保存や削除の処理中は、結果を待つために押せなくする。 */}
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            onClick={() => router.push(SETTINGS_PATH)}
+            className="w-full lg:order-2 lg:w-40"
+          >
+            キャンセル
           </Button>
         </div>
       </form>
