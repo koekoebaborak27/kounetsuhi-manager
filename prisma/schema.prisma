@@ -1,0 +1,271 @@
+// 光熱費マネージャーの DB の定義。
+// テーブルの中身は docs/specs/02_basic-design/ の各機能の 01_データベース.md を写したもの。
+// 変えるときは設計書を先に直し、pnpm prisma:migrate でマイグレーションを作る（prisma/AGENTS.md）。
+
+// アプリから DB を読み書きするためのコードを生成する。
+// 生成先は DB に触ってよい src/shared/db の中にする（生成物なので Git には入れない）。
+generator client {
+  provider = "prisma-client"
+  output   = "../src/shared/db/generated/prisma"
+}
+
+// 接続先は PostgreSQL。接続文字列は prisma.config.ts で .env の DATABASE_URL から渡す。
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// F01 認証と世帯
+// Session・Account・Verification は 5-4 で Better Auth の CLI に作らせる。
+// ---------------------------------------------------------------------------
+
+/// 世帯での役割。
+enum MemberRole {
+  /// オーナー
+  OWNER
+  /// 一般
+  MEMBER
+}
+
+/// 利用者。Better Auth が作るテーブルで、Google から受け取った名前とメールアドレスを保存する。
+model User {
+  /// Better Auth が作る ID
+  id            String   @id
+  /// Google の名前
+  name          String
+  /// Google のメールアドレス
+  email         String   @unique
+  /// Better Auth が使う
+  emailVerified Boolean
+  /// Better Auth が使う（画面には表示しない）
+  image         String?
+  /// 作成日時
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+
+  membership         Membership?
+  createdInvitations Invitation[] @relation("InvitationCreatedBy")
+  usedInvitations    Invitation[] @relation("InvitationUsedBy")
+}
+
+/// 世帯。
+model Household {
+  /// cuid
+  id        String   @id @default(cuid())
+  /// 世帯名。1〜20 文字
+  name      String
+  /// 作成日時
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  memberships   Membership[]
+  invitations   Invitation[]
+  contracts     Contract[]
+  meterReadings MeterReading[]
+}
+
+/// 世帯への所属。1 人が所属できる世帯は 1 つだけ。
+/// 世帯から退出したときは行を消す。行が無い人は世帯に未所属として扱う。
+model Membership {
+  /// cuid
+  id          String     @id @default(cuid())
+  /// User.id への参照。1 人 1 行だけ
+  userId      String     @unique
+  /// Household.id への参照
+  householdId String
+  /// OWNER = オーナー、MEMBER = 一般
+  role        MemberRole
+  /// 参加した日時
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+
+  user      User      @relation(fields: [userId], references: [id])
+  household Household @relation(fields: [householdId], references: [id])
+}
+
+/// 招待コード。
+model Invitation {
+  /// cuid
+  id              String    @id @default(cuid())
+  /// Household.id への参照。参加先の世帯
+  householdId     String
+  /// ハイフンを除いた 8 文字
+  code            String    @unique
+  /// User.id への参照。発行した人
+  createdByUserId String
+  /// 有効期限（発行から 7 日後）
+  expiresAt       DateTime  @db.Timestamptz(3)
+  /// User.id への参照。参加に使った人。未使用なら空
+  usedByUserId    String?
+  /// 参加に使われた日時。未使用なら空
+  usedAt          DateTime? @db.Timestamptz(3)
+  /// 発行日時
+  createdAt       DateTime  @default(now()) @db.Timestamptz(3)
+
+  household     Household @relation(fields: [householdId], references: [id])
+  createdByUser User      @relation("InvitationCreatedBy", fields: [createdByUserId], references: [id])
+  usedByUser    User?     @relation("InvitationUsedBy", fields: [usedByUserId], references: [id])
+
+  // 設定画面で、世帯の使えるコードを一覧にするため。
+  @@index([householdId, expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// F02 契約
+// ---------------------------------------------------------------------------
+
+/// 光熱費の種別。
+enum UtilityType {
+  /// 電気
+  ELECTRICITY
+  /// ガス
+  GAS
+  /// 水道
+  WATER
+}
+
+/// 内訳項目の集計用の分類。
+enum ItemCategory {
+  /// 基本料金
+  BASIC
+  /// 従量料金
+  USAGE
+  /// 調整額
+  ADJUSTMENT
+  /// 賦課金
+  LEVY
+  /// 割引と補助
+  DISCOUNT
+  /// その他
+  OTHER
+}
+
+/// 契約。行を消す操作は設けない。
+model Contract {
+  /// cuid
+  id          String      @id @default(cuid())
+  /// Household.id への参照
+  householdId String
+  /// 種別
+  utilityType UtilityType
+  /// 会社名。1〜30 文字
+  companyName String
+  /// プラン名。30 文字以内
+  planName    String?
+  /// 開始日
+  startDate   DateTime    @db.Date
+  /// 終了日。空は契約中。開始日以降
+  endDate     DateTime?   @db.Date
+  /// メモ。200 文字以内
+  memo        String?
+  /// 作成日時
+  createdAt   DateTime    @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt   DateTime    @updatedAt @db.Timestamptz(3)
+
+  household     Household      @relation(fields: [householdId], references: [id])
+  items         ContractItem[]
+  meterReadings MeterReading[]
+
+  @@index([householdId, utilityType])
+}
+
+/// 契約の内訳項目。検針票の入力画面に並べる項目と順番を決める。
+/// 項目を外したときは行を消さず、removedAt に日時を入れる（検針票の内訳から参照されているため）。
+model ContractItem {
+  /// cuid
+  id         String       @id @default(cuid())
+  /// Contract.id への参照
+  contractId String
+  /// 項目名。候補の項目名、または「その他」で入力した名前（1〜30 文字）
+  name       String
+  /// 集計用の分類
+  category   ItemCategory
+  /// 「その他」で追加した項目なら true
+  isCustom   Boolean
+  /// 表示順。小さいほど上
+  sortOrder  Int
+  /// 外した日時。空なら選択中
+  removedAt  DateTime?    @db.Timestamptz(3)
+  /// 作成日時
+  createdAt  DateTime     @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt  DateTime     @updatedAt @db.Timestamptz(3)
+
+  contract          Contract           @relation(fields: [contractId], references: [id])
+  meterReadingItems MeterReadingItem[]
+
+  // 同じ契約の中で項目名は重ならない。外した項目を選び直したときは同じ行を使い回す。
+  @@unique([contractId, name])
+}
+
+// ---------------------------------------------------------------------------
+// F03 検針票の記録
+// ---------------------------------------------------------------------------
+
+/// 検針票。行を消す操作は設けない。
+/// periodStart と periodEnd は、両方とも入っているか両方とも空かのどちらか（アプリの入力チェックで守る）。
+model MeterReading {
+  /// cuid
+  id           String      @id @default(cuid())
+  /// Household.id への参照
+  householdId  String
+  /// Contract.id への参照
+  contractId   String
+  /// 種別。契約の種別と同じ値を入れる
+  utilityType  UtilityType
+  /// 使用月（その月の 1 日）
+  usageMonth   DateTime    @db.Date
+  /// 請求月（その月の 1 日）
+  billingMonth DateTime?   @db.Date
+  /// 請求額（税込・円）。0〜999,999
+  amount       Int
+  /// 使用期間の開始日
+  periodStart  DateTime?   @db.Date
+  /// 使用期間の終了日。開始日以降
+  periodEnd    DateTime?   @db.Date
+  /// 使用量。0〜99,999.9
+  usage        Decimal?    @db.Decimal(6, 1)
+  /// メモ。200 文字以内
+  memo         String?
+  /// 作成日時
+  createdAt    DateTime    @default(now()) @db.Timestamptz(3)
+  /// 更新日時
+  updatedAt    DateTime    @updatedAt @db.Timestamptz(3)
+
+  household Household          @relation(fields: [householdId], references: [id])
+  contract  Contract           @relation(fields: [contractId], references: [id])
+  items     MeterReadingItem[]
+
+  // 「同じ種別・同じ使用月で 1 件」を DB で守る。種別を契約から引かずにこのテーブルにも持つのはこのため。
+  @@unique([householdId, utilityType, usageMonth])
+}
+
+/// 検針票の内訳。金額を入力した内訳項目だけを保存する。
+/// 項目名と分類の控えを持つのは、契約の内訳項目を変えても登録済みの内訳が変わらないようにするため。
+model MeterReadingItem {
+  /// cuid
+  id             String       @id @default(cuid())
+  /// MeterReading.id への参照
+  meterReadingId String
+  /// ContractItem.id への参照
+  contractItemId String
+  /// 入力したときの項目名の控え
+  name           String
+  /// 入力したときの分類の控え
+  category       ItemCategory
+  /// 金額（円）。割引・補助は負。−999,999〜999,999
+  amount         Int
+  /// 数量。0〜99,999.9
+  quantity       Decimal?     @db.Decimal(6, 1)
+  /// 単価。−9,999.999〜9,999.999
+  unitPrice      Decimal?     @db.Decimal(7, 3)
+  /// 入力画面での並び順。小さいほど上
+  sortOrder      Int
+
+  meterReading MeterReading @relation(fields: [meterReadingId], references: [id])
+  contractItem ContractItem @relation(fields: [contractItemId], references: [id])
+
+  @@unique([meterReadingId, contractItemId])
+}

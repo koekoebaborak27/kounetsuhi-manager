@@ -18,7 +18,7 @@ Prisma スキーマ変更〜DB 反映の**運用手順の正本**。スキーマ
 
 ## 1. 開発時フロー（ローカル）
 
-> **clone 直後の前提**: `pnpm install` だけでは Prisma Client は生成されない。clone 後は最初に一度 `pnpm prisma:generate` を実行する。以降の日常開発では `pnpm prisma:migrate` が generate も行うため、個別に実行する必要はない。
+> **clone 直後の前提**: `pnpm install` だけでは Prisma Client は生成されない。clone 後は最初に一度 `pnpm prisma:generate` を実行する。Prisma 7 からは `pnpm prisma:migrate` を実行しても generate は走らないため、スキーマを変えてマイグレーションを作ったあとも `pnpm prisma:generate` を実行する。
 
 ### 1-1. マイグレーションの作り方は 2 パターン（判断表）
 
@@ -38,6 +38,7 @@ Prisma スキーマ変更〜DB 反映の**運用手順の正本**。スキーマ
 | 部分インデックス・式インデックス（`WHERE` 付き / 関数インデックス） | **B** | Prisma スキーマでは表現できない |
 | `CHECK` 制約 | **B** | 同上 |
 | `CREATE EXTENSION` / `GRANT` 等の DB 設定系 DDL | **B** | 同上 |
+| テーブル・列のコメント（論理名と説明。`COMMENT ON`） | **B**（テーブル・列の追加と同時なら **A + B**） | schema.prisma では表現できない。書き方は [`prisma/AGENTS.md`](../prisma/AGENTS.md) の命名規約。Prisma の差分検出の対象外なので drift にならない |
 
 > **鉄則**: schema.prisma が管理している対象（テーブル・カラム・通常インデックス）をパターン B の手書き SQL で変更してはいけない。schema.prisma と実 DB が乖離し、次の `pnpm prisma:migrate` で drift 検出されて開発が止まる。逆に、schema.prisma で表現できないオブジェクト（関数・トリガー・ビュー等）は drift 検出の対象外なので、B で安全に管理できる。
 
@@ -49,9 +50,12 @@ docker compose -f docker/docker-compose.yml up -d db
 
 # 1) prisma/schema.prisma を編集（命名規約は prisma/AGENTS.md）
 
-# 2) マイグレーション生成 + ローカル DB へ適用 + クライアント再生成
-pnpm prisma:migrate -- --name <変更内容を表す英語スネークケース>
-#    例: pnpm prisma:migrate -- --name add_role_to_users
+# 2) マイグレーション生成 + ローカル DB へ適用
+pnpm prisma:migrate --name <変更内容を表す英語スネークケース>
+#    例: pnpm prisma:migrate --name add_role_to_users
+
+# 3) アプリから使うコードを生成し直す（Prisma 7 では 2) で自動生成されない）
+pnpm prisma:generate
 ```
 
 - `--name` は**必ず付ける**（対話プロンプト待ちで止まらないため。AI エージェントは特に必須）。
@@ -64,8 +68,8 @@ schema.prisma で表現できない変更（§1-1 の表）と、自動生成 SQ
 # 1) （A+B の場合のみ）prisma/schema.prisma を先に編集する。B 単独なら編集不要
 
 # 2) 空（または schema 差分のみ）のマイグレーションを生成する。ローカル DB にはまだ適用されない
-pnpm prisma:migrate -- --create-only --name <name>
-#    例: pnpm prisma:migrate -- --create-only --name add_calc_royalty_summary_fn
+pnpm prisma:migrate --create-only --name <name>
+#    例: pnpm prisma:migrate --create-only --name add_calc_royalty_summary_fn
 
 # 3) 生成された prisma/migrations/<timestamp>_<name>/migration.sql に SQL を記述する
 #    - DB 関数は CREATE OR REPLACE FUNCTION で書く（再適用に強くする）

@@ -7,13 +7,14 @@
 
 - Prisma 標準の命名慣習に従う。テーブル名・カラム名ともに `@@map` / `@map` は基本使わず、モデル定義どおりの camelCase をそのままDBに反映させる。
 - 既存の物理DB（レガシーシステム）に合わせて物理名を固定する必要がある場合のみ、個別に `@@map` / `@map` を使う。
+- テーブルと列には、論理名と説明を DB のコメント（`COMMENT ON`）として付ける。正本は設計書（`docs/specs/02_basic-design/` の各機能の `01_データベース.md`）の「論理名」「説明」の列。コメントは `E'論理名\n説明'` の形にする（A5:SQL Mk-2 が最初の改行の手前を論理名として表示するため。説明が論理名と同じなら論理名だけ）。schema.prisma ではコメントを表せないため、テーブル・列を足すマイグレーションは `--create-only` で作り、`COMMENT ON` を書き足してから適用する。
 
 ## マイグレーション運用（MUST）
 
 運用フローの正本は `@docs/prisma_operations.md`。エージェントが守る最小規則:
 
 - **DB スキーマを変える手段は migration ファイルのみ**。`prisma db push` と psql 等での直接 DDL はどの環境でも禁止。
-- 開発: `pnpm prisma:migrate -- --name <英語snake_case>`（`--name` 必須。対話プロンプトで止まるため）。本番: `prisma migrate deploy` のみ（ローカルから本番 DATABASE_URL に対して手動実行）。
+- 開発: `pnpm prisma:migrate --name <英語snake_case>`（`--name` 必須。対話プロンプトで止まるため。pnpm 10 は `--` をそのまま渡してしまうので、`pnpm prisma:migrate -- --name` とは書かない）。本番: `prisma migrate deploy` のみ（ローカルから本番 DATABASE_URL に対して手動実行）。
 - **適用済みマイグレーション（main マージ済み・本番適用済み）の編集・削除は禁止**。修正は新しいマイグレーションの追加（forward fix）で行う。
 - **schema.prisma 編集 → 自動生成が原則**。schema.prisma で表現できない DDL（DB 関数・トリガー・ビュー・部分インデックス・CHECK 制約・データ移行 UPDATE）のみ `--create-only` で雛形を生成して SQL を手書きする（判断表は `docs/prisma_operations.md` §1-1）。schema.prisma 管理対象（テーブル・カラム・通常インデックス）を手書き SQL で変えるのは禁止（drift になる）。
 - 生成された `migration.sql` は**コミット前に目視レビュー**する（データ損失を伴う DDL や、ライブラリが自前で作るスキーマの混入がないこと）。

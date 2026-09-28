@@ -42,7 +42,7 @@ git status --porcelain   # 未コミット差分がないか確認
 - [x] **4. 詳細設計**（2026-09-28。不要と判断し、詳細設計書は作らない）→ [履歴](history/2026-09.md#2026-09-28-詳細設計を不要と判断)
 - [ ] 5. 実装・単体ロジックテスト（1機能ずつ実装する。→ [`create-vitest-test`](../skills/create-vitest-test.md)）
   - [x] 5-1. Next.js を導入し、ローカルでの起動方法を [`AGENTS.md`](../../AGENTS.md)・[`README.md`](../../README.md) に書く（2026-09-28）→ [履歴](history/2026-09.md#2026-09-28-nextjsを導入して仮のトップページを表示)
-  - [ ] 5-2. Prisma を導入する（`.env.example` から `.env` を作り、各機能の `01_データベース.md` からスキーマを書いて、開発用 DB に最初のマイグレーションを流す）→ [`prisma/AGENTS.md`](../../prisma/AGENTS.md)
+  - [x] 5-2. Prisma を導入し、各機能の `01_データベース.md` からスキーマを書いて、開発用 DB に最初のマイグレーションを流す（2026-09-28。Better Auth の Session・Account・Verification は 5-4 で作る）→ [履歴](history/2026-09.md#2026-09-28-prismaを導入して最初のマイグレーションを適用)
   - [ ] 5-3. `src/shared/`（`AppError`・処理の入口を包む仕組み）を作る → [`src/AGENTS.md`](../../src/AGENTS.md)
   - [ ] 5-4. 認証と世帯（Better Auth による Google ログイン）→ [`01_認証と世帯`](../specs/02_basic-design/01_認証と世帯/README.md)
   - [ ] 5-5. 契約 → [`02_契約`](../specs/02_basic-design/02_契約/README.md)
@@ -64,8 +64,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `feature/setup-nextjs`（5-1。未コミット・PR 未作成）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（仮のトップページ 1 枚）。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。Prisma・Better Auth・`src/shared/` は未導入 |
+| 作業ブランチ | `feature/setup-prisma`（5-2。未コミット・PR 未作成）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（仮のトップページ 1 枚）と Prisma 7.10。開発用 DB にはマイグレーション `init`（Better Auth の Session・Account・Verification を除く 8 テーブル）と `add_table_column_comments`（テーブル・列の論理名と説明のコメント）を適用済み。DB の起動は `docker compose -f docker/docker-compose.yml up -d db`、アプリの起動は `pnpm dev`。Better Auth・`src/shared/`（Prisma のクライアントを作るコードを含む）は未導入 |
 | 本番 | 未構築 |
 
 ## 完了済みの作業
