@@ -41,6 +41,14 @@ git status --porcelain   # 未コミット差分がないか確認
 - [x] **3. 基本設計**（2026-09-25）→ [`docs/specs/02_basic-design/`](../specs/02_basic-design/README.md)・[履歴](history/2026-09.md#2026-09-25-基本設計書の作成)
 - [x] **4. 詳細設計**（2026-09-28。不要と判断し、詳細設計書は作らない）→ [履歴](history/2026-09.md#2026-09-28-詳細設計を不要と判断)
 - [ ] 5. 実装・単体ロジックテスト（1機能ずつ実装する。→ [`create-vitest-test`](../skills/create-vitest-test.md)）
+  - [ ] 5-1. Next.js を導入し、ローカルでの起動方法を [`AGENTS.md`](../../AGENTS.md)・[`README.md`](../../README.md) に書く
+  - [ ] 5-2. Prisma を導入する（`.env.example` から `.env` を作り、各機能の `01_データベース.md` からスキーマを書いて、開発用 DB に最初のマイグレーションを流す）→ [`prisma/AGENTS.md`](../../prisma/AGENTS.md)
+  - [ ] 5-3. `src/shared/`（`AppError`・処理の入口を包む仕組み）を作る → [`src/AGENTS.md`](../../src/AGENTS.md)
+  - [ ] 5-4. 認証と世帯（Better Auth による Google ログイン）→ [`01_認証と世帯`](../specs/02_basic-design/01_認証と世帯/README.md)
+  - [ ] 5-5. 契約 → [`02_契約`](../specs/02_basic-design/02_契約/README.md)
+  - [ ] 5-6. 検針票の記録 → [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)
+  - [ ] 5-7. ホーム → [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)
+  - [ ] 5-8. グラフ → [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)
 - [ ] 6. 画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
 - [ ] 7. ユーザテスト（必要かどうかを判断する）
 
