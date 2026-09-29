@@ -22,7 +22,7 @@
 
 | 区分 | 進捗 |
 | --- | --- |
-| 開発工程（次にやること 1〜7） | 5 / 7 |
+| 開発工程（次にやること 1〜8） | 5 / 8 |
 
 ## 次にやること
 
@@ -56,8 +56,15 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] 5-8. グラフ（2026-09-29）→ [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
     - [x] ① Recharts の導入・共通部分（タブの枠・水道の区切り・検針票の読み出し）・推移タブ（2026-09-29）→ [履歴](history/2026-09-w5.md#2026-09-29-グラフの推移タブs06を作成)
     - [x] ② 年比較タブ・年間タブ（2026-09-29）→ [履歴](history/2026-09-w5.md#2026-09-29-グラフの年比較タブと年間タブs06を作成)
-- [ ] 6. 画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
-- [ ] 7. ユーザテスト（必要かどうかを判断する）
+- [ ] 6. 【後回し】画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
+- [ ] 7. 【後回し】ユーザテスト（必要かどうかを判断する）
+- [ ] 8. 本番構築（手順書は [`docs/specs/99_infra/`](../specs/99_infra/README.md) に手順ごとに分けて残す。実際の値は書かない）
+  - [ ] 8-1. 構成と手順の設計（[`infra_design_00_概要と全体構成.md`](../specs/99_infra/README.md)・事前準備。Supabase・Vercel・Google Cloud の役割と、必要な環境変数の対応表）
+  - [ ] 8-2. 本番用 DB を作る（Supabase の無料プランでプロジェクトを作成し、接続文字列を控える。`prisma migrate deploy` で本番 DB へマイグレーションを流す）
+  - [ ] 8-3. Google ログインの本番設定（Google Cloud の OAuth クライアントに本番 URL のリダイレクト先を追加し、同意画面のテストユーザーに家族を登録する）
+  - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（リポジトリを連携し、`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
+  - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）
+  - [ ] 8-6. 本番の運用の取り決め（DB のバックアップ方法、無料プランの制限、障害時の連絡・戻し方）を `99_infra` に書き、README の「本番デプロイ」を実際の手順に合わせる
 
 ## 残っているタスク
 
