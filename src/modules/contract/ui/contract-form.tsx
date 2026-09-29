@@ -1,14 +1,15 @@
 "use client";
 // S08 の契約フォーム。入力チェック・重なりの警告・保存中の状態を画面で管理する。
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, X } from "lucide-react";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { ja } from "react-day-picker/locale";
 import { createContractAction, deleteContractAction, updateContractAction } from "../actions";
 import { findOverlappingContracts, formatContractName } from "../contract-rules";
 import type { ContractFormData } from "../types";
+import type { UtilityType } from "@/shared/db/generated/prisma/enums";
 import { contractFormSchema } from "../validation";
 import { dateOnlyToLocalDate, formatDateOnly, localDateToDateOnly } from "@/shared/date/date-only";
 import { Alert, AlertDescription } from "@/shared/ui/alert";
@@ -32,6 +33,7 @@ import { showActionError } from "@/shared/ui/show-action-error";
 import { Textarea } from "@/shared/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
 import { UTILITY_TYPES, UTILITY_TYPE_LABELS } from "@/shared/ui/utility-dot";
+import { ContractItemsSection } from "./contract-items-section";
 
 // 「キャンセル」で戻る設定の画面（S07）の URL。
 const SETTINGS_PATH = "/settings";
@@ -100,7 +102,7 @@ function DatePicker({
   );
 }
 
-// S08 の入力欄・警告・保存ボタン。内訳項目は②で作るまで準備中の表示にする。
+// S08 の入力欄・警告・内訳項目・保存ボタン。
 export function ContractForm({
   data,
   currentYear,
@@ -122,8 +124,37 @@ export function ContractForm({
       startDate: data.contract?.startDate ?? "",
       endDate: data.contract?.endDate ?? "",
       memo: data.contract?.memo ?? "",
+      items: data.items,
     },
   });
+  // 内訳項目の一覧。追加・並べ替え・外すは画面の中だけで行い、「保存」で契約と一緒に送る。
+  const itemsArray = useFieldArray({ control: form.control, name: "items" });
+  // 種別を変える確認で、押された種別を覚えておく。null のときは確認を閉じている。
+  const [pendingUtilityType, setPendingUtilityType] = useState<UtilityType | null>(null);
+  // 種別のボタンが押されたときの動き。内訳項目が 1 件以上あるときは、すぐには変えず確認を出す。
+  function handleUtilityTypeChange(value: string, current: string) {
+    // 選択中のボタンをもう一度押したときは、未選択に戻さずそのままにする。
+    if (!value || value === current) return;
+    const next = value as UtilityType;
+    if (itemsArray.fields.length > 0) {
+      setPendingUtilityType(next);
+      return;
+    }
+    form.setValue("utilityType", next, {
+      shouldDirty: true,
+      shouldValidate: form.formState.isSubmitted,
+    });
+  }
+  // 確認で「変更する」を押したときは、種別を切り替え、選んだ内訳項目をすべて外す。
+  function confirmUtilityTypeChange() {
+    if (!pendingUtilityType) return;
+    form.setValue("utilityType", pendingUtilityType, {
+      shouldDirty: true,
+      shouldValidate: form.formState.isSubmitted,
+    });
+    itemsArray.replace([]);
+    setPendingUtilityType(null);
+  }
   // 種別・開始日・終了日が変わるたび、同じ世帯の別の契約との重なりを画面で判定する。
   const [utilityType, startDate, endDate] = useWatch({
     control: form.control,
@@ -183,7 +214,7 @@ export function ContractForm({
                       type="single"
                       variant="outline"
                       value={field.value}
-                      onValueChange={(value) => value && field.onChange(value)}
+                      onValueChange={(value) => handleUtilityTypeChange(value, field.value)}
                       disabled={data.hasMeterReadings}
                     >
                       {UTILITY_TYPES.map((utilityType) => (
@@ -293,8 +324,38 @@ export function ContractForm({
             <h2 id="contract-items-heading" className="text-sm font-bold">
               内訳項目
             </h2>
-            <p className="text-sm text-muted-foreground">準備中です。</p>
+            {/* 種別を変えると候補とひな形が変わるため、区画ごと作り直してひな形の選択を空に戻す。 */}
+            <ContractItemsSection
+              key={utilityType}
+              utilityType={utilityType}
+              itemsArray={itemsArray}
+              disabled={pending}
+            />
+            {/* 画面の操作では起きないが、一覧の入力チェックに通らなかったときの文言をここに出す。 */}
+            {form.formState.errors.items?.message && (
+              <p className="text-xs text-destructive">{form.formState.errors.items.message}</p>
+            )}
           </section>
+          {/* 種別を変えると選んだ内訳項目がすべて外れるため、内訳項目があるときだけ確認する。 */}
+          <AlertDialog
+            open={pendingUtilityType !== null}
+            onOpenChange={(open) => !open && setPendingUtilityType(null)}
+          >
+            {/* 設計書の文言は 1 文だけなので見出しに置き、補足の説明文は付けない。 */}
+            <AlertDialogContent size="sm" aria-describedby={undefined}>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  種別を変更すると、選んだ内訳項目がすべて外れます。変更しますか？
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button">キャンセル</AlertDialogCancel>
+                <AlertDialogAction type="button" onClick={confirmUtilityTypeChange}>
+                  変更する
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         {/* ボタンの並び。スマホでは上から「保存」「契約を削除」「キャンセル」を幅いっぱいに縦に並べる。
             PC では左端に「契約を削除」、右下に「キャンセル」「保存」を同じ幅で横に並べる。 */}

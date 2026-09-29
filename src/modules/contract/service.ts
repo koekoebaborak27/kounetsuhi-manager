@@ -8,6 +8,7 @@ import type { CurrentMembership } from "@/modules/household";
 import {
   createContract as createContractRow,
   deleteContractByIdAndHouseholdId,
+  findActiveContractItemsByContractId,
   findContractByIdAndHouseholdId,
   findContractsByHouseholdId,
   hasMeterReadingsByContractId,
@@ -20,6 +21,8 @@ import {
   isActiveContract,
   sortContracts,
 } from "./contract-rules";
+import type { ContractItemValue } from "./item-catalog";
+import { normalizeContractItems } from "./item-rules";
 import type { ContractFormData, ContractFormContract, ContractList } from "./types";
 import { contractFormSchema, CONTRACT_MESSAGES } from "./validation";
 
@@ -28,6 +31,14 @@ function parseInput<T extends z.ZodType>(schema: T, input: unknown): z.output<T>
   const result = schema.safeParse(input);
   if (!result.success) throw Errors.VALIDATION_ERROR(result.error.issues[0]?.message);
   return result.data;
+}
+
+// 保存する内訳項目の候補の分類を、候補の表の値にそろえる。
+// 選んだ種別の候補に無い名前の候補の項目は、画面では作れないので入力の誤りとして止める。
+function toSavedItems(utilityType: UtilityType, items: ContractItemValue[]): ContractItemValue[] {
+  const normalized = normalizeContractItems(utilityType, items);
+  if (!normalized) throw Errors.VALIDATION_ERROR(undefined, { utilityType });
+  return normalized;
 }
 
 // DB の契約を、日付文字列を使う画面・判定用の形へ変える。
@@ -68,34 +79,44 @@ export async function getContractForm(
   id?: string,
 ): Promise<ContractFormData | null> {
   const contracts = (await findContractsByHouseholdId(membership.householdId)).map(toFormContract);
-  if (!id) return { id: null, contract: null, contracts, hasMeterReadings: false };
+  if (!id) return { id: null, contract: null, contracts, hasMeterReadings: false, items: [] };
+  // 世帯の契約の中から探すことで、他世帯の契約は見つからない扱いにする。
   const contract = contracts.find((item) => item.id === id);
   if (!contract) return null;
-  const hasMeterReadings = await hasMeterReadingsByContractId(id);
-  return { id, contract, contracts, hasMeterReadings };
+  const [hasMeterReadings, items] = await Promise.all([
+    hasMeterReadingsByContractId(id),
+    findActiveContractItemsByContractId(id),
+  ]);
+  return { id, contract, contracts, hasMeterReadings, items };
 }
 
-// S08 の新規登録を保存する。
+// S08 の新規登録を、選んだ内訳項目とともに保存する。
 export async function createContract(membership: CurrentMembership, input: unknown): Promise<void> {
   const parsed = parseInput(contractFormSchema, input);
-  await createContractRow({
-    householdId: membership.householdId,
-    utilityType: parsed.utilityType as UtilityType,
-    companyName: parsed.companyName,
-    planName: parsed.planName || null,
-    startDate: dateOnlyToDbDate(parsed.startDate),
-    endDate: parsed.endDate ? dateOnlyToDbDate(parsed.endDate) : null,
-    memo: parsed.memo || null,
-  });
+  const utilityType = parsed.utilityType as UtilityType;
+  await createContractRow(
+    {
+      householdId: membership.householdId,
+      utilityType,
+      companyName: parsed.companyName,
+      planName: parsed.planName || null,
+      startDate: dateOnlyToDbDate(parsed.startDate),
+      endDate: parsed.endDate ? dateOnlyToDbDate(parsed.endDate) : null,
+      memo: parsed.memo || null,
+    },
+    toSavedItems(utilityType, parsed.items),
+  );
 }
 
-// S08 の編集内容を保存する。検針票がある契約は、保存直前にも種別変更を止める。
+// S08 の編集内容を、内訳項目とともに保存する。検針票がある契約は、保存直前にも種別変更を止める。
 export async function updateContract(
   membership: CurrentMembership,
   id: string,
   input: unknown,
 ): Promise<void> {
   const parsed = parseInput(contractFormSchema, input);
+  const utilityType = parsed.utilityType as UtilityType;
+  const items = toSavedItems(utilityType, parsed.items);
   // 先に世帯の契約か確かめ、他世帯の ID を更新対象にしない。
   const existing = await findContractByIdAndHouseholdId(id, membership.householdId);
   if (!existing)
@@ -106,14 +127,20 @@ export async function updateContract(
       contractId: id,
     });
   }
-  const updated = await updateContractByIdAndHouseholdId(id, membership.householdId, {
-    utilityType: parsed.utilityType as UtilityType,
-    companyName: parsed.companyName,
-    planName: parsed.planName || null,
-    startDate: dateOnlyToDbDate(parsed.startDate),
-    endDate: parsed.endDate ? dateOnlyToDbDate(parsed.endDate) : null,
-    memo: parsed.memo || null,
-  });
+  // 契約と内訳項目は、repository の中で 1 つのトランザクションにまとめて更新する。
+  const updated = await updateContractByIdAndHouseholdId(
+    id,
+    membership.householdId,
+    {
+      utilityType,
+      companyName: parsed.companyName,
+      planName: parsed.planName || null,
+      startDate: dateOnlyToDbDate(parsed.startDate),
+      endDate: parsed.endDate ? dateOnlyToDbDate(parsed.endDate) : null,
+      memo: parsed.memo || null,
+    },
+    items,
+  );
   if (!updated)
     throw Errors.NOT_FOUND(undefined, { contractId: id, householdId: membership.householdId });
 }

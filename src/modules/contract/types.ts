@@ -1,5 +1,6 @@
 // 契約の画面に渡す型。DB の Date はここへ来る前に YYYY-MM-DD の文字列へ変える。
 import type { UtilityType } from "@/shared/db/generated/prisma/enums";
+import type { ContractItemValue } from "./item-catalog";
 
 // S07 の 1 行分。
 export type ContractListItem = {
@@ -27,10 +28,11 @@ export type ContractFormContract = {
   memo: string | null;
 };
 
-// S08 に渡す値。id が null のときは新規登録。
+// S08 に渡す値。id が null のときは新規登録。items は選択中の内訳項目で、表示順に並べる。
 export type ContractFormData = {
   id: string | null;
   contract: ContractFormContract | null;
   contracts: ContractFormContract[];
   hasMeterReadings: boolean;
+  items: ContractItemValue[];
 };

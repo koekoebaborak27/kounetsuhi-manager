@@ -48,9 +48,9 @@ git status --porcelain   # 未コミット差分がないか確認
     - [x] ① 画面の土台（Tailwind CSS v4・shadcn/ui・タブの枠）（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-画面の土台のtailwindとshadcnとタブの枠を作成)
     - [x] ② 認証（Better Auth・Session などのテーブル・画面の振り分け・S01 ログイン・ログアウト）（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-better-authでgoogleログインと画面の振り分けを作成)
     - [x] ③ 世帯（S02 初回設定・S07 設定）（2026-09-28。S07 の契約の区画は 5-5 で作る）→ [履歴](history/2026-09-w4.md#2026-09-28-世帯のs02初回設定とs07設定を作成)
-  - [ ] 5-5. 契約 → [`02_契約`](../specs/02_basic-design/02_契約/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
+  - [x] 5-5. 契約（2026-09-29）→ [`02_契約`](../specs/02_basic-design/02_契約/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
     - [x] ① S07 の契約一覧と、S08 の契約の項目（種別・会社名・プラン名・期間・メモ）の登録・編集（2026-09-28）→ [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)
-    - [ ] ② S08 の内訳項目（候補から追加・その他・外す・並べ替え・ひな形・種別を変えるときの確認）
+    - [x] ② S08 の内訳項目（候補から追加・その他・外す・並べ替え・ひな形・種別を変えるときの確認）（2026-09-29）→ [履歴](history/2026-09-w4.md#2026-09-29-契約の内訳項目の選択と並べ替えを作成)
   - [ ] 5-6. 検針票の記録 → [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)
   - [ ] 5-7. ホーム → [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)
   - [ ] 5-8. グラフ → [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)
@@ -63,7 +63,7 @@ git status --porcelain   # 未コミット差分がないか確認
 
 - [ ] 招待コードで参加するときのトランザクションと同時参加を、DB を使う統合テスト（`*.int.test.ts`）で確かめる。開発用 DB を消さないためのテスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加が要るため、5-4 では作らず単体テストで分岐だけを確かめた → [履歴](history/2026-09-w4.md#2026-09-28-世帯のs02初回設定とs07設定を作成)
 - [ ] ジョブ用の入口ラッパー（`src/shared/observability`）を作る。定期処理は Vercel Cron が API を呼ぶ形で API 用ラッパーで足りるため、ジョブの仕組みを使う場面が出たときに作る → [履歴](history/2026-09.md#2026-09-28-共通部品のdb接続とエラーと入口のラッパーを作成)
-- [ ] 契約の保存で、検針票の有無による種別変更の可否を DB を使う統合テスト（`*.int.test.ts`）で確かめる。テスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加を決めてから作る → [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)
+- [ ] 契約の保存で、検針票の有無による種別変更の可否と、内訳項目の作る・戻す・外す・表示順の振り直しを DB を使う統合テスト（`*.int.test.ts`）で確かめる。テスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加を決めてから作る。振り分けは純粋関数の単体テストで確かめた → [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)・[履歴](history/2026-09-w4.md#2026-09-29-契約の内訳項目の選択と並べ替えを作成)
 
 ## 現在の状態
 
@@ -71,8 +71,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `main`（5-5 の ① まで完了。② はまだ始めていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目を登録・編集・削除できる。検針票がある契約は削除できない。内訳項目は準備中。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
+| 作業ブランチ | `feature/contract-items`（5-5 の ② を実装済み、PR はまだ作っていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
 ## 完了済みの作業
