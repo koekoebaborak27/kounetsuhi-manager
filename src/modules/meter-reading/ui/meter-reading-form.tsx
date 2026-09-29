@@ -40,12 +40,12 @@ import { MeterReadingItemsSection } from "./meter-reading-items-section";
 // 請求月の選択欄で選べる最初の月。
 const BILLING_MONTH_MIN = "2000-01";
 
-// 必須項目のラベルに付ける印。文字色を薄くして、エラー表示と区別する。
+// 必須項目のラベルに付ける印。赤色にして、必須の項目だと一目で分かるようにする。
 function RequiredLabel({ children }: { children: string }) {
   return (
     <FormLabel>
       {children}
-      <span className="text-muted-foreground"> *</span>
+      <span className="text-destructive"> *</span>
     </FormLabel>
   );
 }
@@ -151,7 +151,7 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium">
-                  種別<span className="text-muted-foreground"> *</span>
+                  種別<span className="text-destructive"> *</span>
                 </span>
                 <FixedValue>{utilityLabel}</FixedValue>
               </div>
