@@ -60,7 +60,7 @@ flowchart LR
 | 項目 | 内容 | 影響する手順 |
 | --- | --- | --- |
 | Cron 用の URL | Vercel Cron が呼ぶ専用の URL（`Authorization: Bearer <CRON_SECRET>` を確かめ、`SELECT 1` を送る）と、Cron の設定（`vercel.json` の `crons`）。環境変数 `CRON_SECRET` を使う | 04（環境変数の設定・Cron の確認）、05 |
-| PWA | ホーム画面に追加するための manifest（名前・アイコン）とアイコン画像。`src/app` に manifest も `public/` にアイコンも無い。オフライン動作・通知は要件どおり対応しない | 05（PWA のインストール確認は、実装後に行う） |
+| PWA（**実装済み**: 8-B。`src/app/manifest.ts`・`public/icons/`） | ホーム画面に追加するための manifest（名前・アイコン）とアイコン画像。`src/app` に manifest も `public/` にアイコンも無い。オフライン動作・通知は要件どおり対応しない | 05（PWA のインストール確認は、実装後に行う） |
 
 ## 5. DB の接続方法の考え方（プーラーとは）
 

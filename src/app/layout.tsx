@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Noto_Sans_JP } from "next/font/google";
 import { Toaster } from "@/shared/ui/toaster";
@@ -8,6 +8,13 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "光熱費マネージャー",
   description: "電気・ガス・水道の請求額と使用量を記録して比べるための家族向けアプリ",
+  // ホーム画面に追加したときのアイコン（iPhone・iPad 用）。Android は manifest.ts のアイコンを使う。
+  icons: { apple: "/icons/apple-touch-icon.png" },
+};
+
+// スマートフォンのブラウザ枠の色。manifest.ts の theme_color と合わせる。
+export const viewport: Viewport = {
+  themeColor: "#1a5fd0",
 };
 
 // 本文の文字の書体。globals.css からは変数 --font-noto-sans-jp で使う。
