@@ -1,6 +1,6 @@
 /**
  * 対象: contract/service
- * 目的: 世帯で絞った契約の一覧・表示・保存と、種別変更のロックを担保する
+ * 目的: 世帯で絞った契約の一覧・表示・保存（内訳項目を含む）と、種別変更のロックを担保する
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "@/shared/errors/app-error";
@@ -11,6 +11,7 @@ vi.mock("server-only", () => ({}));
 const repo = {
   createContract: vi.fn(),
   deleteContractByIdAndHouseholdId: vi.fn(),
+  findActiveContractItemsByContractId: vi.fn(),
   findContractByIdAndHouseholdId: vi.fn(),
   findContractsByHouseholdId: vi.fn(),
   hasMeterReadingsByContractId: vi.fn(),
@@ -41,7 +42,16 @@ const input = {
   startDate: "2024-04-01",
   endDate: "",
   memo: " ",
+  items: [
+    { name: "基本料金", category: "OTHER", isCustom: false },
+    { name: "口座振替割引", category: "DISCOUNT", isCustom: true },
+  ],
 };
+// 候補の項目は分類を候補の表の値にそろえ、「その他」は選んだ分類のまま保存する。
+const savedItems = [
+  { name: "基本料金", category: "BASIC", isCustom: false },
+  { name: "口座振替割引", category: "DISCOUNT", isCustom: true },
+];
 const catchError = async (promise: Promise<unknown>) => {
   const error = await promise.catch((value: unknown) => value);
   expect(error).toBeInstanceOf(AppError);
@@ -71,14 +81,22 @@ describe("contract/service", () => {
       repo.findContractsByHouseholdId.mockResolvedValue([row()]);
       await expect(getContractForm(membership, "other")).resolves.toBeNull();
     });
-    it("編集対象と同じ世帯の契約、検針票の有無を返す", async () => {
+    it("編集対象と同じ世帯の契約、検針票の有無、選択中の内訳項目を返す", async () => {
       repo.findContractsByHouseholdId.mockResolvedValue([row()]);
       repo.hasMeterReadingsByContractId.mockResolvedValue(true);
+      repo.findActiveContractItemsByContractId.mockResolvedValue(savedItems);
       await expect(getContractForm(membership, "c1")).resolves.toMatchObject({
         id: "c1",
         hasMeterReadings: true,
         contract: { startDate: "2024-04-01" },
+        items: savedItems,
       });
+      expect(repo.findActiveContractItemsByContractId).toHaveBeenCalledWith("c1");
+    });
+    it("新規登録では内訳項目を空で返す", async () => {
+      repo.findContractsByHouseholdId.mockResolvedValue([]);
+      await expect(getContractForm(membership)).resolves.toMatchObject({ id: null, items: [] });
+      expect(repo.findActiveContractItemsByContractId).not.toHaveBeenCalled();
     });
   });
   describe("createContract", () => {
@@ -92,7 +110,30 @@ describe("contract/service", () => {
           memo: null,
           startDate: new Date("2024-04-01T00:00:00.000Z"),
         }),
+        savedItems,
       );
+    });
+    it("選んだ種別の候補に無い名前の候補の項目があればAppError(VALIDATION_ERROR)を投げ、作らない", async () => {
+      const error = await catchError(
+        createContract(membership, {
+          ...input,
+          items: [{ name: "上水道", category: "USAGE", isCustom: false }],
+        }),
+      );
+      expect(error).toMatchObject({ code: "VALIDATION_ERROR" });
+      expect(repo.createContract).not.toHaveBeenCalled();
+    });
+    it("「その他」の項目名が候補と同じならAppError(VALIDATION_ERROR)を候補から追加する文言で投げる", async () => {
+      const error = await catchError(
+        createContract(membership, {
+          ...input,
+          items: [{ name: "昼間料金", category: "USAGE", isCustom: true }],
+        }),
+      );
+      expect(error).toMatchObject({
+        code: "VALIDATION_ERROR",
+        userMessage: CONTRACT_MESSAGES.itemNameIsCandidate,
+      });
     });
   });
   describe("updateContract", () => {
@@ -114,7 +155,7 @@ describe("contract/service", () => {
       });
       expect(repo.updateContractByIdAndHouseholdId).not.toHaveBeenCalled();
     });
-    it("検針票が無ければ種別を含めて更新する", async () => {
+    it("検針票が無ければ種別を含めて、内訳項目とともに更新する", async () => {
       repo.findContractByIdAndHouseholdId.mockResolvedValue(row());
       repo.hasMeterReadingsByContractId.mockResolvedValue(false);
       repo.updateContractByIdAndHouseholdId.mockResolvedValue(true);
@@ -123,7 +164,27 @@ describe("contract/service", () => {
         "c1",
         "h1",
         expect.objectContaining({ utilityType: "GAS" }),
+        savedItems,
       );
+    });
+    it("検針票があっても種別を変えなければ、内訳項目を含めて更新する", async () => {
+      repo.findContractByIdAndHouseholdId.mockResolvedValue(row());
+      repo.hasMeterReadingsByContractId.mockResolvedValue(true);
+      repo.updateContractByIdAndHouseholdId.mockResolvedValue(true);
+      await updateContract(membership, "c1", { ...input, items: [] });
+      expect(repo.updateContractByIdAndHouseholdId).toHaveBeenCalledWith(
+        "c1",
+        "h1",
+        expect.objectContaining({ utilityType: "ELECTRICITY" }),
+        [],
+      );
+    });
+    it("更新の直前に契約が消えていたらAppError(NOT_FOUND)を投げる", async () => {
+      repo.findContractByIdAndHouseholdId.mockResolvedValue(row());
+      repo.updateContractByIdAndHouseholdId.mockResolvedValue(false);
+      await expect(catchError(updateContract(membership, "c1", input))).resolves.toMatchObject({
+        code: "NOT_FOUND",
+      });
     });
   });
   describe("deleteContract", () => {
