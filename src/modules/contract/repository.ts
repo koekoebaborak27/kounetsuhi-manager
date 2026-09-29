@@ -37,6 +37,24 @@ export async function hasMeterReadingsByContractId(contractId: string): Promise<
   return reading !== null;
 }
 
+// 世帯の同じ種別の契約を、選択中の内訳項目（表示順）とあわせて取り出す。検針票の入力画面で使う。
+// 外した内訳項目は、以後の検針票の入力画面に並べないため含めない。
+export async function findContractsWithActiveItemsByType(
+  householdId: string,
+  utilityType: UtilityType,
+) {
+  return prisma.contract.findMany({
+    where: { householdId, utilityType },
+    include: {
+      items: {
+        where: { removedAt: null },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true, name: true, category: true },
+      },
+    },
+  });
+}
+
 // 契約の選択中の内訳項目を、表示順に取り出す。外した項目は含めない。
 export async function findActiveContractItemsByContractId(contractId: string) {
   return prisma.contractItem.findMany({

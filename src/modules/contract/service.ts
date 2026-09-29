@@ -11,6 +11,7 @@ import {
   findActiveContractItemsByContractId,
   findContractByIdAndHouseholdId,
   findContractsByHouseholdId,
+  findContractsWithActiveItemsByType,
   hasMeterReadingsByContractId,
   updateContractByIdAndHouseholdId,
 } from "./repository";
@@ -23,7 +24,12 @@ import {
 } from "./contract-rules";
 import type { ContractItemValue } from "./item-catalog";
 import { normalizeContractItems } from "./item-rules";
-import type { ContractFormData, ContractFormContract, ContractList } from "./types";
+import type {
+  ContractForMeterReading,
+  ContractFormData,
+  ContractFormContract,
+  ContractList,
+} from "./types";
 import { contractFormSchema, CONTRACT_MESSAGES } from "./validation";
 
 // 入力をスキーマで確かめ、通れば空白を除いた保存用の値を返す。
@@ -172,4 +178,21 @@ export function getOverlapNames(
   contracts: readonly ContractFormContract[],
 ): string[] {
   return findOverlappingContracts(contract, contracts).map(formatContractName);
+}
+
+// 検針票の入力画面で選べる、世帯の同じ種別の契約を返す。終了済みも含め、開始日が新しい順に並べる。
+export async function listContractsForMeterReading(
+  membership: CurrentMembership,
+  utilityType: UtilityType,
+): Promise<ContractForMeterReading[]> {
+  const rows = await findContractsWithActiveItemsByType(membership.householdId, utilityType);
+  return rows
+    .map((row) => ({
+      id: row.id,
+      name: formatContractName(row),
+      startDate: dbDateToDateOnly(row.startDate),
+      endDate: row.endDate ? dbDateToDateOnly(row.endDate) : null,
+      items: row.items,
+    }))
+    .sort((a, b) => b.startDate.localeCompare(a.startDate));
 }

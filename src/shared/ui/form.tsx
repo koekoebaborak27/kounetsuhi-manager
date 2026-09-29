@@ -31,12 +31,14 @@ type FormFieldContextValue<
 const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
 // 1 つの入力項目。name で react-hook-form のどの項目かを指定し、render で入力欄を描く。
+// TTransformedValues は入力チェック後の値の型。スキーマが文字列を数値に変える場合も型が合うよう、そのまま受け渡す。
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TTransformedValues = TFieldValues,
 >({
   ...props
-}: ControllerProps<TFieldValues, TName>) => {
+}: ControllerProps<TFieldValues, TName, TTransformedValues>) => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />

@@ -4,6 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  addDays,
   dateOnlyToDbDate,
   dateOnlyToLocalDate,
   dbDateToDateOnly,
@@ -39,5 +40,15 @@ describe("shared/date/date-only", () => {
       expect(formatDateOnly("2026-09-28")).toBe("2026/09/28"));
     it("カレンダーとの受け渡しではブラウザの年月日を保つ", () =>
       expect(localDateToDateOnly(dateOnlyToLocalDate("2026-09-28"))).toBe("2026-09-28"));
+  });
+
+  describe("addDays", () => {
+    it("月末から 1 日足すと翌月 1 日になる", () =>
+      expect(addDays("2026-08-31", 1)).toBe("2026-09-01"));
+    it("年末から 1 日足すと翌年 1 月 1 日になる", () =>
+      expect(addDays("2026-12-31", 1)).toBe("2027-01-01"));
+    it("うるう年の 2 月 28 日から 1 日足すと 29 日になる", () =>
+      expect(addDays("2028-02-28", 1)).toBe("2028-02-29"));
+    it("負の数を渡すと前の日になる", () => expect(addDays("2026-03-01", -1)).toBe("2026-02-28"));
   });
 });

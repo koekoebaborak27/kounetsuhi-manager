@@ -14,13 +14,20 @@ const repo = {
   findActiveContractItemsByContractId: vi.fn(),
   findContractByIdAndHouseholdId: vi.fn(),
   findContractsByHouseholdId: vi.fn(),
+  findContractsWithActiveItemsByType: vi.fn(),
   hasMeterReadingsByContractId: vi.fn(),
   updateContractByIdAndHouseholdId: vi.fn(),
 };
 vi.mock("./repository", () => repo);
 
-const { createContract, deleteContract, getContractForm, getContractList, updateContract } =
-  await import("./service");
+const {
+  createContract,
+  deleteContract,
+  getContractForm,
+  getContractList,
+  listContractsForMeterReading,
+  updateContract,
+} = await import("./service");
 const membership: CurrentMembership = { userId: "u1", householdId: "h1", role: "OWNER" };
 const row = (override: Record<string, unknown> = {}) => ({
   id: "c1",
@@ -204,6 +211,39 @@ describe("contract/service", () => {
         userMessage: "検針票が登録済みのため、契約は削除できません。",
       });
       expect(repo.deleteContractByIdAndHouseholdId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("listContractsForMeterReading", () => {
+    it("世帯の同じ種別の契約を、終了済みも含めて開始日が新しい順に表示名付きで返す", async () => {
+      repo.findContractsWithActiveItemsByType.mockResolvedValue([
+        row({ id: "old", endDate: new Date("2025-03-31T00:00:00.000Z"), items: [] }),
+        row({
+          id: "new",
+          companyName: "つばめ電力",
+          planName: null,
+          startDate: new Date("2025-04-01T00:00:00.000Z"),
+          items: [{ id: "i1", name: "基本料金", category: "BASIC" }],
+        }),
+      ]);
+      const contracts = await listContractsForMeterReading(membership, "ELECTRICITY");
+      expect(repo.findContractsWithActiveItemsByType).toHaveBeenCalledWith("h1", "ELECTRICITY");
+      expect(contracts).toEqual([
+        {
+          id: "new",
+          name: "つばめ電力",
+          startDate: "2025-04-01",
+          endDate: null,
+          items: [{ id: "i1", name: "基本料金", category: "BASIC" }],
+        },
+        {
+          id: "old",
+          name: "さくら電力 従量電灯B",
+          startDate: "2024-04-01",
+          endDate: "2025-03-31",
+          items: [],
+        },
+      ]);
     });
   });
 });

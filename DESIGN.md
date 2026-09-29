@@ -85,13 +85,13 @@
 ### スマホ版（幅 1024px 未満）
 
 - 画面の下部に「ホーム・記録・グラフ・設定」の 4 つのタブを固定する。選択中のタブは `primary` の色にする。
-- 入力画面（S04・S08）の保存ボタンは画面の幅いっぱいにする。S04 は「キャンセル」と「保存」を同じ幅で横に並べる。S08 は上から「保存」「契約を削除」（編集時だけ）「キャンセル」を幅いっぱいに縦に並べる。
+- 入力画面（S04・S08）の保存ボタンは画面の幅いっぱいにする。S04 は「キャンセル」と「保存」を同じ幅で横に並べ、その下に「検針票を削除」（編集時だけ）を幅いっぱいに置く。S08 は上から「保存」「契約を削除」（編集時だけ）「キャンセル」を幅いっぱいに縦に並べる。
 
 ### PC 版（幅 1024px 以上）
 
 - 下部のタブの代わりに、左側に幅 180px の縦メニューを置く（上にアプリ名、下に 4 項目）。選択中の項目は `accent` の面に、左端に `primary` の線を付ける。
 - 中身は 2 列に並べる（例：S04 は左に基本の項目・右に内訳、S07 は左に世帯とメンバー・右に契約）。行が少ない画面（S05 記録・S06 年間）は横に広げすぎず、幅 640〜720px に収める。
-- 保存ボタンは右下に置き、「キャンセル」と「保存」を同じ幅（160px 前後）で並べる。S08 の「契約を削除」は左下に置く。
+- 保存ボタンは右下に置き、「キャンセル」と「保存」を同じ幅（160px 前後）で並べる。S08 の「契約を削除」と S04 の「検針票を削除」は左下に置く。
 
 ### 画面ごとの要点
 
@@ -160,10 +160,12 @@
   - 追加する部品が既存の部品（`button` など）を使うとき、CLI は上書きするかを対話で聞いて止まる。既存の部品を残すため、`yes n | pnpm dlx shadcn@latest add <name> -y` のように「上書きしない」を流し込む。
   - `sonner`（トースト）は CLI で追加しない。CLI 版はダークモード用の `next-themes` を使うため、`src/shared/ui/toaster.tsx` を自前で置いている。
 - 汎用の部品は `src/shared/ui`、**機能専用**の部品は各モジュールの `src/modules/<機能>/ui/` に置く。
-- 画面の URL は S01 `/login`・S02 `/setup`・S03 `/`・S05 `/records`・S06 `/graphs`・S07 `/settings`・S08（登録）`/settings/contracts/new`・S08（編集）`/settings/contracts/[id]`。タブのある画面は `src/app/(main)/` に置き、共通の枠（`(main)/layout.tsx` と `src/shared/ui/tab-nav.tsx`）に入れる。各画面の一番上には `PageTitle`（`src/shared/ui/page-title.tsx`）を置く。
+- 画面の URL は S01 `/login`・S02 `/setup`・S03 `/`・S05 `/records`（表示する月は `?month=2026-08`）・S04（作成）`/records/new?type=gas&month=2026-08`・S04（編集）`/records/[id]`・S06 `/graphs`・S07 `/settings`・S08（登録）`/settings/contracts/new`・S08（編集）`/settings/contracts/[id]`。S04 をホームから開くときは `&from=home`（編集は `?from=home`）を付け、ホームのタブを選択中にして「キャンセル」でホームへ戻す。タブのある画面は `src/app/(main)/` に置き、共通の枠（`(main)/layout.tsx` と `src/shared/ui/tab-nav.tsx`）に入れる。各画面の一番上には `PageTitle`（`src/shared/ui/page-title.tsx`）を置く。
 - クラスの結合は `cn()`（`@/shared/ui/utils`、clsx + tailwind-merge）を使う。
 - アイコンは `lucide-react`（既定 `size-4` = 16px）、トースト通知は `sonner`（`@/shared/ui/toaster`）。
-- 種別の色見本・増減の表示・使用月の表示（「6月分」「5-6月分」）は、画面ごとに作らず `src/shared/ui` の共通部品にする。
+- 種別の色見本・増減の表示・使用月の表示（「6月分」「5-6月分」）は、画面ごとに作らず `src/shared/ui` の共通部品にする。使用月の表示は `usage-month.ts` の `formatUsageMonth`、種別の色見本は `utility-dot.tsx`。
+- 年月の選択は `month-picker.tsx`（押すと年の切り替えと 12 か月のボタンが並ぶ小窓）、日付の選択は `date-picker.tsx`（`Calendar` + `Popover`）を使う。
+- 入力中の画面から離れる前の確認は `leave-guard.tsx`。入力画面で `useLeaveGuard(入力を変えたか)` を呼ぶと、タブを押したときの確認と、再読み込み・ブラウザのタブを閉じるときのブラウザ標準の確認が出る。
 
 ### Server / Client の使い分け
 
