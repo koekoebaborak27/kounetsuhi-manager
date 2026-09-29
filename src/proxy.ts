@@ -23,6 +23,9 @@ export async function proxy(request: NextRequest) {
 
 // 振り分けを行う URL。画面だけを対象にし、API（ログインの API を含む）・Next.js の内部のファイル・画像などは除く。
 // API は画面ではないので振り分けず、それぞれの処理の中でログインを確かめる。
+// ホーム画面への追加に使う manifest とアイコンは、ログイン前でも取得できる必要があるので除く。
 export const config = {
-  matcher: ["/((?!api/|_next/static|_next/image|images/|favicon.ico).*)"],
+  matcher: [
+    "/((?!api/|_next/static|_next/image|images/|icons/|favicon.ico|manifest.webmanifest).*)",
+  ],
 };
