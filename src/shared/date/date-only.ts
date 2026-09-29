@@ -57,3 +57,11 @@ export function addDays(value: string, days: number): string {
   date.setUTCDate(date.getUTCDate() + days);
   return dbDateToDateOnly(date);
 }
+
+// 2 つの日付の日数の差を返す（to − from）。同じ日なら 0、翌日なら 1 になる。
+export function daysBetween(from: string, to: string): number {
+  // UTC 午前 0 時どうしの差なので、夏時間などで 1 日の長さがずれることはなく、24 時間で割り切れる。
+  return Math.round(
+    (dateOnlyToDbDate(to).getTime() - dateOnlyToDbDate(from).getTime()) / 86_400_000,
+  );
+}

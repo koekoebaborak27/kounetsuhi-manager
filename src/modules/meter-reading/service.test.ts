@@ -14,6 +14,7 @@ const repo = {
   findMeterReadingIdByMonth: vi.fn(),
   findMeterReadingsByContractId: vi.fn(),
   findMeterReadingsByMonths: vi.fn(),
+  findMeterReadingsForHome: vi.fn(),
   findMeterReadingWithItems: vi.fn(),
   updateMeterReading: vi.fn(),
 };
@@ -27,6 +28,7 @@ const {
   getMeterReadingCreateForm,
   getMeterReadingEditForm,
   getRecordsMonth,
+  listMeterReadingsForHome,
   updateMeterReading,
 } = await import("./service");
 
@@ -108,6 +110,30 @@ describe("meter-reading/service", () => {
     repo.updateMeterReading.mockResolvedValue("updated");
   });
   afterEach(() => vi.useRealTimers());
+
+  describe("listMeterReadingsForHome", () => {
+    it("所属する世帯の検針票を、年月・日付の文字列に直して返す", async () => {
+      repo.findMeterReadingsForHome.mockResolvedValue([
+        {
+          utilityType: "GAS",
+          usageMonth: db("2026-08"),
+          amount: 3_850,
+          periodStart: db("2026-07-13"),
+          periodEnd: null,
+        },
+      ]);
+      expect(await listMeterReadingsForHome(membership)).toEqual([
+        {
+          utilityType: "GAS",
+          usageMonth: "2026-08",
+          amount: 3_850,
+          periodStart: "2026-07-13",
+          periodEnd: null,
+        },
+      ]);
+      expect(repo.findMeterReadingsForHome).toHaveBeenCalledWith("h1");
+    });
+  });
 
   describe("getRecordsMonth", () => {
     it("URL に月が無いときは前月を表示し、表示中の月と前月を世帯で絞って読む", async () => {

@@ -1,11 +1,16 @@
+// S03 ホームの画面。所属する世帯の検針票から、今年の合計と種別ごとの最新の状況を表示する。
+import { getHomeView, HomeSummary } from "@/modules/home";
+import { requireMembership } from "@/modules/household";
 import { PageTitle } from "@/shared/ui/page-title";
 
-// ホームの画面の仮のページ。タブの切り替えを確かめるためだけに置いている。中身は 5-7 で作る。
-export default function HomePage() {
+// 世帯の所属を確かめてから、ホームに表示する内容を読んで描画する。
+export default async function HomePage() {
+  const membership = await requireMembership();
+  const view = await getHomeView(membership);
   return (
     <>
       <PageTitle>ホーム</PageTitle>
-      <main className="px-4 py-4 text-sm text-muted-foreground lg:px-7">準備中です。</main>
+      <HomeSummary view={view} />
     </>
   );
 }

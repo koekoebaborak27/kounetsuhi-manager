@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addDays,
+  daysBetween,
   dateOnlyToDbDate,
   dateOnlyToLocalDate,
   dbDateToDateOnly,
@@ -50,5 +51,16 @@ describe("shared/date/date-only", () => {
     it("うるう年の 2 月 28 日から 1 日足すと 29 日になる", () =>
       expect(addDays("2028-02-28", 1)).toBe("2028-02-29"));
     it("負の数を渡すと前の日になる", () => expect(addDays("2026-03-01", -1)).toBe("2026-02-28"));
+  });
+
+  describe("daysBetween", () => {
+    it("同じ日なら 0 になる", () => expect(daysBetween("2026-08-01", "2026-08-01")).toBe(0));
+    it("翌日なら 1 になる", () => expect(daysBetween("2026-08-01", "2026-08-02")).toBe(1));
+    it("月をまたいでも日数を数える", () =>
+      expect(daysBetween("2026-07-15", "2026-08-14")).toBe(30));
+    it("うるう年の 2 月をまたぐと 29 日分を含める", () =>
+      expect(daysBetween("2028-02-01", "2028-03-01")).toBe(29));
+    it("終了日が開始日より前なら負の数になる", () =>
+      expect(daysBetween("2026-08-02", "2026-08-01")).toBe(-1));
   });
 });
