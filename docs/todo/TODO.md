@@ -62,7 +62,7 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] 8-1. 構成と手順の設計（2026-09-29。00 概要と全体構成・01 事前準備と環境変数の対応表を書き、02〜05 は章立てまで）→ [`99_infra`](../specs/99_infra/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-本番構築の構成と手順を設計)
   - [ ] 8-2. 本番用 DB を作る（Supabase の無料プランでプロジェクトを作成し、接続文字列を控える。`prisma migrate deploy` で本番 DB へマイグレーションを流す）
   - [ ] 8-3. Google ログインの本番設定（Google Cloud の OAuth クライアントに本番 URL のリダイレクト先を追加し、同意画面のテストユーザーに家族を登録する）
-  - [ ] 8-A. 【8-4 の前に】Vercel Cron 用の URL を実装する（1 日 1 回 `SELECT 1` を送り、`CRON_SECRET` を確かめる。`vercel.json` の `crons` も足す。Supabase の一時停止を防ぐため。設計は [`00_全体共通.md`](../specs/02_basic-design/00_全体共通.md)）
+  - [x] 8-A. 【8-4 の前に】Vercel Cron 用の URL を実装した（2026-09-29。`/api/cron/keepalive`・`vercel.json` の `crons`。設計は [`00_全体共通.md`](../specs/02_basic-design/00_全体共通.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-vercel-cron-用の-url-を実装)
   - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（リポジトリを連携し、`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
   - [x] 8-B. 【8-5 の前に】PWA の manifest とアイコンを実装した（2026-09-29。`src/app/manifest.ts`・`public/icons/`。要件は [`01_全体要件.md`](../specs/01_requirements/00_全体/01_全体要件.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-pwa-の-manifest-とアイコンを実装)
   - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）
