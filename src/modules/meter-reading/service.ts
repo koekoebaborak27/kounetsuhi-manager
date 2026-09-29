@@ -19,6 +19,7 @@ import {
   deleteMeterReading as deleteMeterReadingRow,
   findMeterReadingIdByMonth,
   findMeterReadingsByContractId,
+  findMeterReadingsForGraphs,
   findMeterReadingsForHome,
   findMeterReadingsByMonths,
   findMeterReadingWithItems,
@@ -41,7 +42,12 @@ import {
   USAGE_MONTH_MIN,
   type ItemForSave,
 } from "./reading-rules";
-import type { MeterReadingForHome, MeterReadingFormData, RecordsMonthView } from "./types";
+import type {
+  MeterReadingForGraph,
+  MeterReadingForHome,
+  MeterReadingFormData,
+  RecordsMonthView,
+} from "./types";
 import {
   meterReadingFormSchema,
   METER_READING_ERROR_CODES,
@@ -191,6 +197,20 @@ export async function listMeterReadingsForHome(
     amount: reading.amount,
     periodStart: reading.periodStart ? dbDateToDateOnly(reading.periodStart) : null,
     periodEnd: reading.periodEnd ? dbDateToDateOnly(reading.periodEnd) : null,
+  }));
+}
+
+// グラフの計算に使う、所属する世帯のすべての検針票を返す。ほかの機能（グラフ）から使う公開の読み出し。
+export async function listMeterReadingsForGraphs(
+  membership: CurrentMembership,
+): Promise<MeterReadingForGraph[]> {
+  const readings = await findMeterReadingsForGraphs(membership.householdId);
+  return readings.map((reading) => ({
+    utilityType: reading.utilityType,
+    usageMonth: dbDateToYearMonth(reading.usageMonth),
+    amount: reading.amount,
+    // 使用量は小数なので、number にせず小数 1 桁の文字列で渡す。空のままなら null。
+    usage: reading.usage ? reading.usage.toFixed(1) : null,
   }));
 }
 

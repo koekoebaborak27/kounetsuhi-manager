@@ -4,8 +4,9 @@ export {
   getMeterReadingCreateForm,
   getMeterReadingEditForm,
   getRecordsMonth,
+  listMeterReadingsForGraphs,
   listMeterReadingsForHome,
 } from "./service";
-export type { MeterReadingForHome } from "./types";
+export type { MeterReadingForGraph, MeterReadingForHome } from "./types";
 export { MeterReadingForm } from "./ui/meter-reading-form";
 export { RecordsMonth } from "./ui/records-month";

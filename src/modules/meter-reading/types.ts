@@ -52,3 +52,11 @@ export type MeterReadingForHome = {
   periodStart: string | null;
   periodEnd: string | null;
 };
+
+// グラフの計算に渡す検針票 1 件分。年月は YYYY-MM の文字列、使用量は小数 1 桁の文字列（空なら null）にする。
+export type MeterReadingForGraph = {
+  utilityType: UtilityType;
+  usageMonth: string;
+  amount: number;
+  usage: string | null;
+};

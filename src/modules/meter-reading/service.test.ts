@@ -14,6 +14,7 @@ const repo = {
   findMeterReadingIdByMonth: vi.fn(),
   findMeterReadingsByContractId: vi.fn(),
   findMeterReadingsByMonths: vi.fn(),
+  findMeterReadingsForGraphs: vi.fn(),
   findMeterReadingsForHome: vi.fn(),
   findMeterReadingWithItems: vi.fn(),
   updateMeterReading: vi.fn(),
@@ -28,6 +29,7 @@ const {
   getMeterReadingCreateForm,
   getMeterReadingEditForm,
   getRecordsMonth,
+  listMeterReadingsForGraphs,
   listMeterReadingsForHome,
   updateMeterReading,
 } = await import("./service");
@@ -132,6 +134,26 @@ describe("meter-reading/service", () => {
         },
       ]);
       expect(repo.findMeterReadingsForHome).toHaveBeenCalledWith("h1");
+    });
+  });
+
+  describe("listMeterReadingsForGraphs", () => {
+    it("所属する世帯の検針票を、年月の文字列と小数 1 桁の使用量の文字列に直して返す。使用量が空なら null", async () => {
+      // Prisma の Decimal は toFixed を持つ。テストでは同じ形の小さな代役を使う。
+      repo.findMeterReadingsForGraphs.mockResolvedValue([
+        {
+          utilityType: "ELECTRICITY",
+          usageMonth: db("2026-08"),
+          amount: 12_640,
+          usage: { toFixed: () => "412.0" },
+        },
+        { utilityType: "GAS", usageMonth: db("2026-08"), amount: 3_850, usage: null },
+      ]);
+      expect(await listMeterReadingsForGraphs(membership)).toEqual([
+        { utilityType: "ELECTRICITY", usageMonth: "2026-08", amount: 12_640, usage: "412.0" },
+        { utilityType: "GAS", usageMonth: "2026-08", amount: 3_850, usage: null },
+      ]);
+      expect(repo.findMeterReadingsForGraphs).toHaveBeenCalledWith("h1");
     });
   });
 
