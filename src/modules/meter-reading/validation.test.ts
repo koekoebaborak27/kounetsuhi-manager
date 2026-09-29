@@ -48,10 +48,8 @@ describe("meter-reading/validation meterReadingFormSchema", () => {
         { contractItemId: "i2", name: "従量料金", amount: null, quantity: null, unitPrice: null },
       ]);
     });
-    it("任意の項目（請求月・使用期間・使用量・メモ）は空でも通る", () =>
-      expect(
-        issuesOf({ billingMonth: "", periodStart: "", periodEnd: "", usage: "", memo: "" }),
-      ).toEqual([]));
+    it("任意の項目（請求月・使用量・メモ）は空でも通る", () =>
+      expect(issuesOf({ billingMonth: "", usage: "", memo: "" })).toEqual([]));
   });
 
   describe("使用月・請求月・契約", () => {
@@ -86,6 +84,10 @@ describe("meter-reading/validation meterReadingFormSchema", () => {
   });
 
   describe("使用期間", () => {
+    it("両方とも空なら、開始日の下に「使用期間を入力してください。」を 1 つだけ出す", () =>
+      expect(issuesOf({ periodStart: "", periodEnd: " " })).toEqual([
+        { path: "periodStart", message: METER_READING_MESSAGES.periodRequired },
+      ]));
     it("片方だけ入力したときは、空の側に文言を出す", () => {
       expect(issuesOf({ periodStart: "" })).toEqual([
         { path: "periodStart", message: METER_READING_MESSAGES.periodBothRequired },

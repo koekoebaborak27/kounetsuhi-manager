@@ -27,6 +27,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/shared/ui/input";
 import { showActionError } from "@/shared/ui/show-action-error";
 import { Textarea } from "@/shared/ui/textarea";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
 import { UTILITY_TYPES, UTILITY_TYPE_LABELS } from "@/shared/ui/utility-dot";
 import { ContractItemsSection } from "./contract-items-section";
@@ -34,12 +35,12 @@ import { ContractItemsSection } from "./contract-items-section";
 // 「キャンセル」で戻る設定の画面（S07）の URL。
 const SETTINGS_PATH = "/settings";
 
-// 必須項目のラベルに付ける印。赤色にして、必須の項目だと一目で分かるようにする。
+// 必須項目のラベル。後ろに必須の印を付ける。
 function RequiredLabel({ children }: { children: string }) {
   return (
     <FormLabel>
       {children}
-      <span className="text-destructive"> *</span>
+      <RequiredMark />
     </FormLabel>
   );
 }

@@ -22,6 +22,7 @@ export const METER_READING_MESSAGES = {
   contractNotFound: "契約が見つかりません。選び直してください。",
   amountRequired: "請求額を入力してください。",
   amountInvalid: "請求額は0〜999,999の整数で入力してください。",
+  periodRequired: "使用期間を入力してください。",
   periodBothRequired: "使用期間は開始日と終了日の両方を入力してください。",
   invalidDate: "正しい日付を入力してください。",
   periodEndBeforeStart: "終了日は開始日以降の日付を入力してください。",
@@ -53,8 +54,9 @@ const optionalNumber = (rule: NumberInputRule, message: string) =>
     return parsed;
   });
 
-// 任意の日付（YYYY-MM-DD）。空は空文字のまま通し、日付として正しくないものは止める。
-const optionalDateOnly = z
+// 日付（YYYY-MM-DD）。日付として正しくないものは止める。
+// 空かどうかは開始日と終了日をまとめて見て文言を出し分けるため、ここでは空を通し、後の確認に任せる。
+const dateOnlyInput = z
   .string()
   .trim()
   .refine((value) => value === "" || isValidDateOnly(value), METER_READING_MESSAGES.invalidDate);
@@ -91,16 +93,22 @@ export const meterReadingFormSchema = z
       }
       return Number(parsed);
     }),
-    periodStart: optionalDateOnly,
-    periodEnd: optionalDateOnly,
+    periodStart: dateOnlyInput,
+    periodEnd: dateOnlyInput,
     usage: optionalNumber(USAGE_RULE, METER_READING_MESSAGES.usageInvalid),
     memo: z.string().trim().max(METER_READING_MEMO_MAX_LENGTH, METER_READING_MESSAGES.memoTooLong),
     items: z.array(itemSchema),
   })
   .superRefine((value, context) => {
-    // 使用期間は両方とも入っているか、両方とも空かのどちらか。空の側の下に文言を出す。
+    // 使用期間は必須。両方とも空なら開始日の下に 1 つだけ文言を出し、片方だけ空ならその側の下に出す。
     const { periodStart, periodEnd } = value;
-    if ((periodStart === "") !== (periodEnd === "")) {
+    if (periodStart === "" && periodEnd === "") {
+      context.addIssue({
+        code: "custom",
+        path: ["periodStart"],
+        message: METER_READING_MESSAGES.periodRequired,
+      });
+    } else if (periodStart === "" || periodEnd === "") {
       context.addIssue({
         code: "custom",
         path: [periodStart === "" ? "periodStart" : "periodEnd"],
