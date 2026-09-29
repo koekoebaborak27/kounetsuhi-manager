@@ -164,6 +164,7 @@
 - クラスの結合は `cn()`（`@/shared/ui/utils`、clsx + tailwind-merge）を使う。
 - アイコンは `lucide-react`（既定 `size-4` = 16px）、トースト通知は `sonner`（`@/shared/ui/toaster`）。
 - 種別の色見本・増減の表示・使用月の表示（「6月分」「5-6月分」）は、画面ごとに作らず `src/shared/ui` の共通部品にする。使用月の表示は `usage-month.ts` の `formatUsageMonth`、種別の色見本は `utility-dot.tsx`。
+- 増減率の計算と文字列にする関数は `src/shared/format/change-rate.ts`（`calcChangeRate`・`formatChangeRate`）、色付きの表示は `src/shared/ui/delta.tsx` の `Delta`（増は赤・減は青・0.0% と「—」は色なし）。ホームとグラフで共通に使う。
 - 年月の選択は `month-picker.tsx`（押すと年の切り替えと 12 か月のボタンが並ぶ小窓）、日付の選択は `date-picker.tsx`（`Calendar` + `Popover`）を使う。
 - 入力中の画面から離れる前の確認は `leave-guard.tsx`。入力画面で `useLeaveGuard(入力を変えたか)` を呼ぶと、タブを押したときの確認と、再読み込み・ブラウザのタブを閉じるときのブラウザ標準の確認が出る。
 

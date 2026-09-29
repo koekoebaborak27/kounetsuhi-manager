@@ -19,6 +19,7 @@ import {
   deleteMeterReading as deleteMeterReadingRow,
   findMeterReadingIdByMonth,
   findMeterReadingsByContractId,
+  findMeterReadingsForHome,
   findMeterReadingsByMonths,
   findMeterReadingWithItems,
   updateMeterReading as updateMeterReadingRow,
@@ -40,7 +41,7 @@ import {
   USAGE_MONTH_MIN,
   type ItemForSave,
 } from "./reading-rules";
-import type { MeterReadingFormData, RecordsMonthView } from "./types";
+import type { MeterReadingForHome, MeterReadingFormData, RecordsMonthView } from "./types";
 import {
   meterReadingFormSchema,
   METER_READING_ERROR_CODES,
@@ -177,6 +178,20 @@ export async function getRecordsMonth(
     nextMonth: month < usageMonthMax(currentMonth) ? addMonths(month, 1) : null,
     rows,
   };
+}
+
+// ホームの計算に使う、所属する世帯のすべての検針票を返す。ほかの機能（ホーム）から使う公開の読み出し。
+export async function listMeterReadingsForHome(
+  membership: CurrentMembership,
+): Promise<MeterReadingForHome[]> {
+  const readings = await findMeterReadingsForHome(membership.householdId);
+  return readings.map((reading) => ({
+    utilityType: reading.utilityType,
+    usageMonth: dbDateToYearMonth(reading.usageMonth),
+    amount: reading.amount,
+    periodStart: reading.periodStart ? dbDateToDateOnly(reading.periodStart) : null,
+    periodEnd: reading.periodEnd ? dbDateToDateOnly(reading.periodEnd) : null,
+  }));
 }
 
 // 作成画面を開いたときの結果。同じ種別・使用月の検針票がすでにあれば、その編集へ移すために ID を返す。

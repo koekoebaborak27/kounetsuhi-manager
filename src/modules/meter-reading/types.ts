@@ -43,3 +43,12 @@ export type MeterReadingFormData = {
   contracts: ContractForMeterReading[];
   values: MeterReadingFormValues;
 };
+
+// ホームの計算に渡す検針票 1 件分。日付は DB の Date ではなく、年月は YYYY-MM・日付は YYYY-MM-DD の文字列にする。
+export type MeterReadingForHome = {
+  utilityType: UtilityType;
+  usageMonth: string;
+  amount: number;
+  periodStart: string | null;
+  periodEnd: string | null;
+};
