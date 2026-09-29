@@ -34,12 +34,12 @@ import { ContractItemsSection } from "./contract-items-section";
 // 「キャンセル」で戻る設定の画面（S07）の URL。
 const SETTINGS_PATH = "/settings";
 
-// 必須項目のラベルに付ける印。文字色を薄くして、エラー表示と区別する。
+// 必須項目のラベルに付ける印。赤色にして、必須の項目だと一目で分かるようにする。
 function RequiredLabel({ children }: { children: string }) {
   return (
     <FormLabel>
       {children}
-      <span className="text-muted-foreground"> *</span>
+      <span className="text-destructive"> *</span>
     </FormLabel>
   );
 }

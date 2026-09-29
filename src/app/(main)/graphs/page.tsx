@@ -1,5 +1,14 @@
 // S06 グラフの画面。上のタブ（推移・年比較・年間）を URL の ?tab= で切り替える。
-import { getTrendView, GraphTabs, parseGraphTab, TrendTab } from "@/modules/graph";
+import {
+  AnnualTab,
+  CompareTab,
+  getAnnualView,
+  getCompareView,
+  getTrendView,
+  GraphTabs,
+  parseGraphTab,
+  TrendTab,
+} from "@/modules/graph";
 import { requireMembership } from "@/modules/household";
 import { PageTitle } from "@/shared/ui/page-title";
 
@@ -17,8 +26,8 @@ export default async function GraphsPage({
       <main className="flex flex-col gap-4 px-4 py-4 lg:px-7">
         <GraphTabs current={tab} />
         {tab === "trend" && <TrendTab view={await getTrendView(membership)} />}
-        {/* 年比較・年間のタブは次の PR で作る。 */}
-        {tab !== "trend" && <p className="text-sm text-muted-foreground">準備中です。</p>}
+        {tab === "compare" && <CompareTab view={await getCompareView(membership)} />}
+        {tab === "annual" && <AnnualTab view={await getAnnualView(membership)} />}
       </main>
     </>
   );

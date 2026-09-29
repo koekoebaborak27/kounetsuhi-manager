@@ -22,7 +22,7 @@
 
 | 区分 | 進捗 |
 | --- | --- |
-| 開発工程（次にやること 1〜7） | 4 / 7 |
+| 開発工程（次にやること 1〜7） | 5 / 7 |
 
 ## 次にやること
 
@@ -40,7 +40,7 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] [`DESIGN.md`](../../DESIGN.md) を画面イメージに合わせて刷新（2026-09-25）→ [履歴](history/2026-09.md#2026-09-25-テンプレート由来の文書をプロジェクト用に整備)
 - [x] **3. 基本設計**（2026-09-25）→ [`docs/specs/02_basic-design/`](../specs/02_basic-design/README.md)・[履歴](history/2026-09.md#2026-09-25-基本設計書の作成)
 - [x] **4. 詳細設計**（2026-09-28。不要と判断し、詳細設計書は作らない）→ [履歴](history/2026-09.md#2026-09-28-詳細設計を不要と判断)
-- [ ] 5. 実装・単体ロジックテスト（1機能ずつ実装する。→ [`create-vitest-test`](../skills/create-vitest-test.md)）
+- [x] 5. 実装・単体ロジックテスト（2026-09-29。1機能ずつ実装する。→ [`create-vitest-test`](../skills/create-vitest-test.md)）
   - [x] 5-1. Next.js を導入し、ローカルでの起動方法を [`AGENTS.md`](../../AGENTS.md)・[`README.md`](../../README.md) に書く（2026-09-28）→ [履歴](history/2026-09.md#2026-09-28-nextjsを導入して仮のトップページを表示)
   - [x] 5-2. Prisma を導入し、各機能の `01_データベース.md` からスキーマを書いて、開発用 DB に最初のマイグレーションを流す（2026-09-28。Better Auth の Session・Account・Verification は 5-4 で作る）→ [履歴](history/2026-09.md#2026-09-28-prismaを導入して最初のマイグレーションを適用)
   - [x] 5-3. `src/shared/`（Prisma のクライアント・`AppError`・処理の入口を包む仕組み）を作る（2026-09-28。ジョブ用は作らず[残っているタスク](#残っているタスク)へ）→ [履歴](history/2026-09.md#2026-09-28-共通部品のdb接続とエラーと入口のラッパーを作成)
@@ -53,9 +53,9 @@ git status --porcelain   # 未コミット差分がないか確認
     - [x] ② S08 の内訳項目（候補から追加・その他・外す・並べ替え・ひな形・種別を変えるときの確認）（2026-09-29）→ [履歴](history/2026-09-w4.md#2026-09-29-契約の内訳項目の選択と並べ替えを作成)
   - [x] 5-6. 検針票の記録（2026-09-29。S05 記録と S04 検針票の入力を 1 つの PR にまとめた）→ [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-検針票のs05記録とs04入力を作成)
   - [x] 5-7. ホーム（2026-09-29。1 つの PR にまとめた）→ [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-ホームs03を作成)
-  - [ ] 5-8. グラフ → [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
+  - [x] 5-8. グラフ（2026-09-29）→ [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
     - [x] ① Recharts の導入・共通部分（タブの枠・水道の区切り・検針票の読み出し）・推移タブ（2026-09-29）→ [履歴](history/2026-09-w5.md#2026-09-29-グラフの推移タブs06を作成)
-    - [ ] ② 年比較タブ・年間タブ
+    - [x] ② 年比較タブ・年間タブ（2026-09-29）→ [履歴](history/2026-09-w5.md#2026-09-29-グラフの年比較タブと年間タブs06を作成)
 - [ ] 6. 画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
 - [ ] 7. ユーザテスト（必要かどうかを判断する）
 
@@ -73,8 +73,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `main`（5-8 ① まで完了。5-8 ② はまだ始めていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる（年比較・年間のタブは「準備中」）。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
+| 作業ブランチ | `feature/graphs-compare-annual`（5-8 ② を実装中。PR 前）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる。年比較タブで今年・前年・前々年の折れ線を種別・金額 / 使用量で比べ、年間タブで今年の合計・前年比・月平均と年ごとの合計の表を確かめられる。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
 ## 完了済みの作業
