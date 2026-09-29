@@ -33,3 +33,10 @@ export function UtilityDot({
     />
   );
 }
+
+// 種別ごとの使用量の単位。
+export const UTILITY_TYPE_UNITS: Record<UtilityType, string> = {
+  ELECTRICITY: "kWh",
+  GAS: "㎥",
+  WATER: "㎥",
+};

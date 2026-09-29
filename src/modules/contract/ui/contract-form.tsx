@@ -3,15 +3,12 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, X } from "lucide-react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { ja } from "react-day-picker/locale";
 import { createContractAction, deleteContractAction, updateContractAction } from "../actions";
 import { findOverlappingContracts, formatContractName } from "../contract-rules";
 import type { ContractFormData } from "../types";
 import type { UtilityType } from "@/shared/db/generated/prisma/enums";
 import { contractFormSchema } from "../validation";
-import { dateOnlyToLocalDate, formatDateOnly, localDateToDateOnly } from "@/shared/date/date-only";
 import { Alert, AlertDescription } from "@/shared/ui/alert";
 import {
   AlertDialog,
@@ -25,10 +22,9 @@ import {
   AlertDialogTrigger,
 } from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
-import { Calendar } from "@/shared/ui/calendar";
+import { DatePicker } from "@/shared/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { showActionError } from "@/shared/ui/show-action-error";
 import { Textarea } from "@/shared/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
@@ -45,60 +41,6 @@ function RequiredLabel({ children }: { children: string }) {
       {children}
       <span className="text-muted-foreground"> *</span>
     </FormLabel>
-  );
-}
-
-// 日付入力とカレンダーを結ぶ部品。空の終了日は「空欄＝契約中」を表示する。
-function DatePicker({
-  value,
-  onChange,
-  placeholder,
-  yearRange,
-  clearable = false,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  yearRange: { from: number; to: number };
-  clearable?: boolean;
-}) {
-  const startMonth = new Date(yearRange.from, 0, 1);
-  const endMonth = new Date(yearRange.to, 11, 1);
-  return (
-    <div className="flex gap-1">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button type="button" variant="outline" className="w-full justify-between font-normal">
-            <span className={value ? "" : "text-muted-foreground"}>
-              {value ? formatDateOnly(value) : placeholder}
-            </span>
-            <CalendarIcon aria-hidden />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={value ? dateOnlyToLocalDate(value) : undefined}
-            onSelect={(date) => date && onChange(localDateToDateOnly(date))}
-            captionLayout="dropdown"
-            startMonth={startMonth}
-            endMonth={endMonth}
-            locale={ja}
-          />
-        </PopoverContent>
-      </Popover>
-      {clearable && value && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="終了日を消す"
-          onClick={() => onChange("")}
-        >
-          <X aria-hidden />
-        </Button>
-      )}
-    </div>
   );
 }
 
@@ -290,7 +232,7 @@ export function ContractForm({
                         onChange={field.onChange}
                         placeholder="空欄＝契約中"
                         yearRange={yearRange}
-                        clearable
+                        clearLabel="終了日を消す"
                       />
                     </FormControl>
                     <FormMessage />

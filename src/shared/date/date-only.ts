@@ -50,3 +50,10 @@ export function localDateToDateOnly(date: Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+// YYYY-MM-DD に日数を足す（負の数なら引く）。月末・年末をまたぐときも正しく繰り上げる。
+export function addDays(value: string, days: number): string {
+  const date = dateOnlyToDbDate(value);
+  date.setUTCDate(date.getUTCDate() + days);
+  return dbDateToDateOnly(date);
+}
