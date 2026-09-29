@@ -11,7 +11,8 @@ export function Segmented<T extends string>({
 }: {
   label: string;
   value: T;
-  options: readonly { value: T; label: string }[];
+  // disabled を付けた選択肢は押せなくなる。
+  options: readonly { value: T; label: string; disabled?: boolean }[];
   onChange: (value: T) => void;
 }) {
   return (
@@ -27,7 +28,12 @@ export function Segmented<T extends string>({
       className="w-full sm:w-auto"
     >
       {options.map((option) => (
-        <ToggleGroupItem key={option.value} value={option.value} className="flex-1 sm:flex-none">
+        <ToggleGroupItem
+          key={option.value}
+          value={option.value}
+          disabled={option.disabled}
+          className="flex-1 sm:flex-none"
+        >
           {option.label}
         </ToggleGroupItem>
       ))}

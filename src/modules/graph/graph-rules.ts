@@ -1,11 +1,18 @@
 // グラフに表示する値を計算する純粋関数。DB や今日の日付はここでは取得せず、引数で受け取る。
 // 画面とサービスの両方で同じ基準を使い、単体テストで計算だけを確かめるため、DB・日時に依存させない。
 import type { UtilityType } from "@/shared/db/generated/prisma/enums";
-import { addMonths, splitYearMonth } from "@/shared/date/year-month";
+import { addMonths, splitYearMonth, toYearMonth } from "@/shared/date/year-month";
 import { formatUsageMonth } from "@/shared/ui/usage-month";
+import { calcChangeRate } from "@/shared/format/change-rate";
 import { UTILITY_TYPE_LABELS, UTILITY_TYPE_UNITS, UTILITY_TYPES } from "@/shared/ui/utility-dot";
 import type { MeterReadingForGraph } from "@/modules/meter-reading";
 import type {
+  AnnualRow,
+  AnnualView,
+  CompareChart,
+  CompareFilter,
+  CompareSet,
+  CompareView,
   TrendCard,
   TrendChart,
   TrendFilter,
@@ -173,4 +180,154 @@ export function buildTrendView(
     ]),
   ) as TrendView["charts"];
   return { charts, cards };
+}
+
+// 年比較タブの種別の切り替えの並び。
+export const COMPARE_FILTERS: readonly CompareFilter[] = [...UTILITY_TYPES, "TOTAL"];
+
+// 年比較タブの水道の横軸になる、その年の区切りの後ろの月（1〜12）。偶数・奇数は世帯の水道の検針票に合わせる。
+function waterEndMonthsOfYear(parity: 0 | 1): number[] {
+  // 偶数なら 2・4・…・12 月、奇数なら 1・3・…・11 月（1 月の区切りは前年の 12 月をまたぐ「12-1月」）。
+  return Array.from({ length: 6 }, (_, i) => (parity === 0 ? 2 : 1) + i * 2);
+}
+
+// 年比較タブの点 1 つ分の値を求める。検針票が無い月（区切り）は null。
+function compareValue(
+  index: ReadingIndex,
+  filter: CompareFilter,
+  month: string,
+  metric: "amount" | "usage",
+): number | null {
+  if (filter === "TOTAL") {
+    // 合計は 3 種別の請求額を使用月ごとに足す。水道も 2 か月に分けず、その使用月にそのまま載せる。
+    const found = UTILITY_TYPES.map((type) => index.get(indexKey(type, month))).filter(
+      (reading) => reading !== undefined,
+    );
+    // 検針票が 1 件も無い月は 0 円ではなく、点を置かない。
+    return found.length === 0 ? null : found.reduce((sum, reading) => sum + reading.amount, 0);
+  }
+  const reading = index.get(indexKey(filter, month));
+  if (!reading) return null;
+  return metric === "amount" ? reading.amount : usageToNumber(reading.usage);
+}
+
+// 年比較タブのグラフ 1 つ分を作る。今年・前年・前々年の 3 年から、選んだ種別に検針票がある年だけを折れ線にする。
+export function buildCompareChart(
+  readings: readonly MeterReadingForGraph[],
+  currentYear: number,
+  filter: CompareFilter,
+  metric: "amount" | "usage",
+): CompareChart {
+  const index = buildIndex(readings);
+  // 新しい年から順に 3 年分。
+  const candidates = [currentYear, currentYear - 1, currentYear - 2];
+  const years = candidates.filter((year) =>
+    readings.some(
+      (reading) =>
+        splitYearMonth(reading.usageMonth).year === year &&
+        (filter === "TOTAL" || reading.utilityType === filter),
+    ),
+  );
+  // 横軸の並び。水道は区切りの後ろの月（1 月の区切りは「12-1月」）、それ以外は 1〜12 月。
+  const months =
+    filter === "WATER"
+      ? waterEndMonthsOfYear(waterEndParity(readings))
+      : Array.from({ length: 12 }, (_, i) => i + 1);
+  return {
+    years,
+    points: months.map((month) => ({
+      label: filter === "WATER" ? waterBucketLabel(toYearMonth(2000, month)) : String(month),
+      // 区切りが年をまたぐ「12-1月」も、後ろの月（1 月）の年の点にする。
+      values: Object.fromEntries(
+        years.map((year) => [year, compareValue(index, filter, toYearMonth(year, month), metric)]),
+      ),
+    })),
+    usageUnit: metric === "usage" && filter !== "TOTAL" ? UTILITY_TYPE_UNITS[filter] : null,
+  };
+}
+
+// 年比較タブに表示する内容全体を作る。種別ごとに、金額と使用量のグラフを先に用意する。
+export function buildCompareView(
+  readings: readonly MeterReadingForGraph[],
+  currentMonth: string,
+): CompareView {
+  const currentYear = splitYearMonth(currentMonth).year;
+  const charts = Object.fromEntries(
+    COMPARE_FILTERS.map((filter): [CompareFilter, CompareSet] => [
+      filter,
+      {
+        amount: buildCompareChart(readings, currentYear, filter, "amount"),
+        // 合計には使用量が無いので、使用量のグラフは作らない。
+        usage:
+          filter === "TOTAL" ? null : buildCompareChart(readings, currentYear, filter, "usage"),
+      },
+    ]),
+  ) as CompareView["charts"];
+  return { currentYear, charts };
+}
+
+// 今年の行に添える集計した期間。「（1〜8月）」の形で、最後の月が 1 月のときは「（1月）」にする。
+export function annualPeriodLabel(lastMonth: number): string {
+  return lastMonth === 1 ? "（1月）" : `（1〜${lastMonth}月）`;
+}
+
+// 年間タブに表示する内容全体を作る。今年の合計・前年比・月平均と、年ごとの合計の表。
+export function buildAnnualView(
+  readings: readonly MeterReadingForGraph[],
+  currentMonth: string,
+): AnnualView {
+  const currentYear = splitYearMonth(currentMonth).year;
+  const thisYear = readings.filter((r) => splitYearMonth(r.usageMonth).year === currentYear);
+  const thisYearTotal = thisYear.reduce((sum, r) => sum + r.amount, 0);
+
+  // 今年の記録がある最後の月（種別を問わない）。今年の検針票が無いときは null。
+  const lastMonth =
+    thisYear.length === 0
+      ? null
+      : Math.max(...thisYear.map((r) => splitYearMonth(r.usageMonth).month));
+  // 記録のある月数は、どれか 1 種別でも検針票がある使用月の数。
+  const recordedMonths = new Set(thisYear.map((r) => r.usageMonth)).size;
+
+  // 前年比は、前年の 1 月から今年の最後の月と同じ月までの合計と比べる（期間をそろえるため）。
+  let changeRate: number | null = null;
+  if (lastMonth !== null) {
+    const samePeriod = readings.filter((r) => {
+      const { year, month } = splitYearMonth(r.usageMonth);
+      return year === currentYear - 1 && month <= lastMonth;
+    });
+    // 前年の同じ期間の検針票が無いときは比べられない（0 円扱いにしない）。
+    if (samePeriod.length > 0) {
+      changeRate = calcChangeRate(
+        thisYearTotal,
+        samePeriod.reduce((sum, r) => sum + r.amount, 0),
+      );
+    }
+  }
+
+  // 年ごとの合計の表。検針票が 1 件でもある年を新しい年から並べる。
+  const years = [...new Set(readings.map((r) => splitYearMonth(r.usageMonth).year))].sort(
+    (a, b) => b - a,
+  );
+  const rows = years.map((year): AnnualRow => {
+    const ofYear = readings.filter((r) => splitYearMonth(r.usageMonth).year === year);
+    const amounts = { ELECTRICITY: null, GAS: null, WATER: null } as AnnualRow["amounts"];
+    for (const type of UTILITY_TYPES) {
+      const ofType = ofYear.filter((r) => r.utilityType === type);
+      // その年にその種別の検針票が無いときは 0 円ではなく null（「—」）にする。
+      if (ofType.length > 0) amounts[type] = ofType.reduce((sum, r) => sum + r.amount, 0);
+    }
+    return {
+      year,
+      periodLabel: year === currentYear && lastMonth !== null ? annualPeriodLabel(lastMonth) : null,
+      amounts,
+      total: ofYear.reduce((sum, r) => sum + r.amount, 0),
+    };
+  });
+
+  return {
+    thisYearTotal,
+    changeRate,
+    monthlyAverage: recordedMonths === 0 ? null : Math.round(thisYearTotal / recordedMonths),
+    rows,
+  };
 }
