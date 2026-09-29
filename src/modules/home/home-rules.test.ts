@@ -1,5 +1,5 @@
 /**
- * 対象: home/home-rules（最新の検針票・前回比・前年同月比・1 日あたりの金額・今年の合計・次を作成する使用月）
+ * 対象: home/home-rules（最新の検針票・前回比・前年同月比・1 日あたりの金額・今年の合計・次月分を作成する使用月）
  * 目的: ホームに表示する値の選び方と計算（水道の 2 か月・比べる検針票が無いとき・範囲の外）を担保する
  */
 import { describe, expect, it } from "vitest";
@@ -188,7 +188,7 @@ describe("home/home-rules", () => {
         ).toBe(true));
     });
 
-    describe("次を作成する使用月", () => {
+    describe("次月分を作成する使用月", () => {
       it("電気・ガスは最新の 1 か月後にする", () =>
         expect(
           cardOf(buildHomeView([reading("GAS", "2026-08", 1)], current, limit), "GAS").latest!

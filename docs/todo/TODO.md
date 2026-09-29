@@ -72,7 +72,7 @@ git status --porcelain   # 未コミット差分がないか確認
 | 項目 | 状態 |
 | --- | --- |
 | 作業ブランチ | `feature/home`（5-7 の作業中。PR 前）。既定は `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
 ## 完了済みの作業

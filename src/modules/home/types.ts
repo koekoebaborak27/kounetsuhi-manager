@@ -11,7 +11,7 @@ export type HomeLatest = {
   monthRate: number | null;
   yearRate: number | null;
   dailyAmount: number | null;
-  // 「次を作成」で開く使用月。翌月より先になるとき null（ボタンを押せなくする）。
+  // 「次月分を作成」で開く使用月。翌月より先になるとき null（ボタンを押せなくする）。
   nextMonth: string | null;
 };
 

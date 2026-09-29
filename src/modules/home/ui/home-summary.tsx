@@ -34,14 +34,14 @@ function UtilityCard({ card }: { card: HomeCard }) {
             <Button asChild size="sm">
               <Link
                 href={newMeterReadingHref(utilityType, latest.nextMonth, "home")}
-                aria-label={`${label}の次を作成`}
+                aria-label={`${label}の次月分を作成`}
               >
-                次を作成
+                次月分を作成
               </Link>
             </Button>
           ) : (
-            <Button size="sm" disabled aria-label={`${label}の次を作成（まだ作成できません）`}>
-              次を作成
+            <Button size="sm" disabled aria-label={`${label}の次月分を作成（まだ作成できません）`}>
+              次月分を作成
             </Button>
           )
         ) : (
