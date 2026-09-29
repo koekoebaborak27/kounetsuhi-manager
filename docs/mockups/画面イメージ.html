@@ -34,7 +34,8 @@
   .btn.gray { border-color: #888; color: #555; }
   .field { margin-bottom: 10px; }
   .field label { display: block; font-size: 12px; color: #555; margin-bottom: 3px; }
-  .req::after { content: " *"; color: #d33; }
+  .req::after { content: " *"; color: #d33; font-weight: bold; font-size: 15px; line-height: 1; }
+  .fold { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px; margin: 14px 0 6px; }
   .input { border: 1px solid #aaa; border-radius: 6px; padding: 7px 8px; min-height: 34px; background: #fff; }
   .input.fixed { background: #f0f0f0; color: #555; }
   .input.ph { color: #aaa; }
@@ -216,6 +217,7 @@
   <div class="phone">
     <div class="bar">検針票の入力</div>
     <div class="content">
+      <div class="section-title" style="margin-top:0">基本情報</div>
       <div class="row">
         <div class="field" style="flex:1"><label class="req">種別</label><div class="input fixed">ガス</div></div>
         <div class="field" style="flex:1"><label class="req">使用月</label><div class="input fixed">2026年8月分</div></div>
@@ -223,37 +225,22 @@
       <div class="field"><label>請求月</label><div class="input row"><span>2026年9月</span><span>▼</span></div></div>
       <div class="field"><label class="req">契約</label><div class="input row"><span>みなとガス 一般料金</span><span>▼</span></div></div>
       <div class="field"><label class="req">請求額（税込）</label><div class="input row"><span>3,850</span><span class="muted">円</span></div></div>
-      <div class="field"><label>使用期間</label>
+      <div class="field"><label class="req">使用期間</label>
         <div class="row"><div class="input row" style="flex:1"><span>2026/07/13</span><span>📅</span></div>〜<div class="input row" style="flex:1"><span>2026/08/12</span><span>📅</span></div></div>
       </div>
       <div class="field"><label>使用量</label><div class="input row"><span>19.4</span><span class="muted">㎥</span></div></div>
-
-      <div class="section-title">内訳</div>
-      <div class="list-item">
-        <div class="row"><span>基本料金</span><div class="input" style="width:110px;text-align:right">1,056 円</div></div>
-        <div class="row small muted" style="margin-top:4px"><span>数量</span><div class="input ph" style="flex:1;min-height:26px;padding:3px 6px">任意</div><span>単価</span><div class="input ph" style="flex:1;min-height:26px;padding:3px 6px">任意</div></div>
-      </div>
-      <div class="list-item">
-        <div class="row"><span>従量料金</span><div class="input" style="width:110px;text-align:right">2,952 円</div></div>
-        <div class="row small muted" style="margin-top:4px"><span>数量</span><div class="input" style="flex:1;min-height:26px;padding:3px 6px">19.4</div><span>単価</span><div class="input" style="flex:1;min-height:26px;padding:3px 6px">152.17</div></div>
-      </div>
-      <div class="list-item">
-        <div class="row"><span>原料費調整額</span><div class="input" style="width:110px;text-align:right">−58 円</div></div>
-      </div>
-      <div class="list-item">
-        <div class="row"><span>補助値引き</span><div class="input ph" style="width:110px;text-align:right">円</div></div>
-      </div>
-      <div class="row small" style="margin:8px 0"><span>内訳の合計</span><b>3,950 円</b></div>
-      <div class="warn">内訳の合計（3,950 円）が請求額（3,850 円）と一致しません。このまま保存もできます。</div>
-
       <div class="field"><label>メモ</label><div class="input" style="min-height:52px"></div></div>
-      <div class="row"><span class="btn gray" style="flex:1;text-align:center;padding:10px;font-size:14px">キャンセル</span><span class="btn main" style="flex:1">保存</span></div>
+
+      <div class="fold"><span>料金の内訳（任意）</span><span class="muted">∨</span></div>
+      <div class="row" style="margin-top:14px"><span class="btn gray" style="flex:1;text-align:center;padding:10px;font-size:14px">キャンセル</span><span class="btn main" style="flex:1">保存</span></div>
     </div>
     <div class="tabs"><div>ホーム</div><div class="on">記録</div><div>グラフ</div><div>設定</div></div>
   </div>
   <div class="memo">
     <p>記録画面でガス 8月分の「作成」を押した直後に、金額を途中まで入れた状態。請求月・契約・使用期間の開始日は初期値。</p>
-    <p>数量・単価は各内訳の下に小さく並べた（2 項目目は入力済みの例）。</p>
+    <p>見出し「基本情報」の下に入力欄とメモを並べる。項目名はすべて同じ見た目で、必須の項目には赤の太字で少し大きい「*」を付ける。使用期間は必須（2026-09-29 に変更）。</p>
+    <p>「料金の内訳（任意）」は最初は閉じておき、押すと開く（中身は PC の図の右側と同じ）。編集で内訳が入力済みのとき・内訳の入力チェックに通らなかったときは開いておく（2026-09-29 に追加）。</p>
+    <p>開いたときは、数量・単価を各内訳の下に小さく並べ、その下に内訳の合計と、請求額と合わないときの警告を出す。</p>
     <p>編集のときは、「キャンセル」「保存」の下に赤い「検針票を削除」を幅いっぱいに置く（押すと確認を出す。2026-09-29 に追加）。</p>
 <p>保存の横に「キャンセル」を置く。下部タブは表示し、入力中に別の画面へ移ろうとしたときは「入力内容が失われます。移動しますか？」と確認を出す。</p>
     <p>請求月は年月の選択、使用期間はカレンダーで入力する。終了日の初期値は、開始日の 1 か月後の前日（水道は 2 か月後の前日）。</p>
@@ -567,6 +554,7 @@
       <div class="content">
         <div class="cols">
           <div>
+            <div class="section-title" style="margin-top:0">基本情報</div>
             <div class="row">
               <div class="field" style="flex:1"><label class="req">種別</label><div class="input fixed">ガス</div></div>
               <div class="field" style="flex:1"><label class="req">使用月</label><div class="input fixed">2026年8月分</div></div>
@@ -574,12 +562,12 @@
             <div class="field"><label>請求月</label><div class="input row"><span>2026年9月</span><span>▼</span></div></div>
             <div class="field"><label class="req">契約</label><div class="input row"><span>みなとガス 一般料金</span><span>▼</span></div></div>
             <div class="field"><label class="req">請求額（税込）</label><div class="input row"><span>3,850</span><span class="muted">円</span></div></div>
-            <div class="field"><label>使用期間</label><div class="row"><div class="input row" style="flex:1"><span>2026/07/13</span><span>📅</span></div>〜<div class="input row" style="flex:1"><span>2026/08/12</span><span>📅</span></div></div></div>
+            <div class="field"><label class="req">使用期間</label><div class="row"><div class="input row" style="flex:1"><span>2026/07/13</span><span>📅</span></div>〜<div class="input row" style="flex:1"><span>2026/08/12</span><span>📅</span></div></div></div>
             <div class="field"><label>使用量</label><div class="input row"><span>19.4</span><span class="muted">㎥</span></div></div>
             <div class="field"><label>メモ</label><div class="input" style="min-height:52px"></div></div>
           </div>
           <div>
-            <div class="section-title" style="margin-top:0">内訳</div>
+            <div class="fold" style="margin-top:0"><span>料金の内訳（任意）</span><span class="muted">∧</span></div>
             <table>
               <tr><th>項目</th><th>金額</th><th>数量</th><th>単価</th></tr>
               <tr><td>基本料金</td><td><div class="input" style="text-align:right">1,056</div></td><td><div class="input ph">任意</div></td><td><div class="input ph">任意</div></td></tr>
@@ -595,7 +583,7 @@
       </div>
     </div>
   </div>
-  <div class="memo"><p>左に基本の項目、右に内訳を表で並べ、1 画面に収めた。キャンセルと保存は右下。編集のときは左下に赤い「検針票を削除」を置く（2026-09-29 に追加）。入力中に左のメニューで移ろうとしたときは確認を出す。</p></div>
+  <div class="memo"><p>左に基本情報とメモ、右に料金の内訳を表で並べ、1 画面に収めた。料金の内訳はスマホと同じく最初は閉じており、図は開いた状態（2026-09-29 に変更）。キャンセルと保存は右下。編集のときは左下に赤い「検針票を削除」を置く（2026-09-29 に追加）。入力中に左のメニューで移ろうとしたときは確認を出す。</p></div>
 </section>
 
 <!-- ===== PC S06 グラフ（推移） ===== -->

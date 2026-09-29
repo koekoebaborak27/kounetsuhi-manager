@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDownIcon } from "lucide-react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { splitYearMonth } from "@/shared/date/year-month";
 import {
@@ -23,6 +24,7 @@ import { Input } from "@/shared/ui/input";
 import { useLeaveGuard } from "@/shared/ui/leave-guard";
 import { MonthPicker } from "@/shared/ui/month-picker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { RequiredMark } from "@/shared/ui/required-mark";
 import { showActionError } from "@/shared/ui/show-action-error";
 import { Textarea } from "@/shared/ui/textarea";
 import { formatUsageMonth } from "@/shared/ui/usage-month";
@@ -40,15 +42,19 @@ import { MeterReadingItemsSection } from "./meter-reading-items-section";
 // 請求月の選択欄で選べる最初の月。
 const BILLING_MONTH_MIN = "2000-01";
 
-// 必須項目のラベルに付ける印。赤色にして、必須の項目だと一目で分かるようにする。
+// 必須項目のラベル。後ろに必須の印を付ける。
 function RequiredLabel({ children }: { children: string }) {
   return (
     <FormLabel>
       {children}
-      <span className="text-destructive"> *</span>
+      <RequiredMark />
     </FormLabel>
   );
 }
+
+// 入力欄と結び付かない見出し（種別・使用期間）の文字の見た目。他の入力欄のラベル（FormLabel）とそろえる。
+const PLAIN_LABEL =
+  "flex items-center gap-2 text-xs leading-none font-medium text-muted-foreground";
 
 // 変更できない値の表示欄（種別・作成時の使用月）。入力欄と同じ大きさで、muted の面にする。
 function FixedValue({ children }: { children: string }) {
@@ -88,6 +94,10 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
   const hasContracts = data.contracts.length > 0;
   // 内訳の文言（契約を選んでいるかどうか）の出し分けに使う。
   const contractId = useWatch({ control: form.control, name: "contractId" });
+  // 内訳を開いているか。入力が無いときは、画面がごちゃつかないよう最初は閉じておく（編集で入力済みなら開く）。
+  const [itemsOpen, setItemsOpen] = useState(() => hasItemInput(data.values.items));
+  // 内訳の入力チェックに通らなかった項目があるときは、閉じたままだと気付けないので開いて見せる。
+  const itemsExpanded = itemsOpen || Boolean(form.formState.errors.items);
 
   // 契約を変え、選んだ契約の内訳項目を表示順に並べ直す。入力した内訳の値は消える。
   function applyContract(nextId: string) {
@@ -145,13 +155,20 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 px-4 py-4 lg:px-7">
-        {/* スマホでは上から「基本の項目・内訳・メモ」、PC では左に基本の項目とメモ、右に内訳を並べる。 */}
+        {/* スマホでは上から「基本情報・料金の内訳」、PC では左に基本情報、右に料金の内訳を並べる。 */}
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:gap-x-10">
-          <div className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1">
+          <section
+            aria-labelledby="meter-reading-basic-heading"
+            className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1"
+          >
+            <h2 id="meter-reading-basic-heading" className="text-sm font-bold">
+              基本情報
+            </h2>
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium">
-                  種別<span className="text-destructive"> *</span>
+              <div className="flex flex-col gap-1.5">
+                <span className={PLAIN_LABEL}>
+                  種別
+                  <RequiredMark />
                 </span>
                 <FixedValue>{utilityLabel}</FixedValue>
               </div>
@@ -266,7 +283,10 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
               )}
             />
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-2 text-sm font-medium">使用期間</legend>
+              <legend className={`mb-1.5 ${PLAIN_LABEL}`}>
+                使用期間
+                <RequiredMark />
+              </legend>
               <div className="flex items-start gap-2">
                 <FormField
                   control={form.control}
@@ -280,7 +300,6 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
                           onChange={field.onChange}
                           placeholder="開始日"
                           yearRange={{ from: 2000, to: splitYearMonth(data.billingMonthMax).year }}
-                          clearLabel="開始日を消す"
                           disabled={pending}
                         />
                       </FormControl>
@@ -301,7 +320,6 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
                           onChange={field.onChange}
                           placeholder="終了日"
                           yearRange={{ from: 2000, to: splitYearMonth(data.billingMonthMax).year }}
-                          clearLabel="終了日を消す"
                           disabled={pending}
                         />
                       </FormControl>
@@ -335,38 +353,57 @@ export function MeterReadingForm({ data }: { data: MeterReadingFormData }) {
                 </FormItem>
               )}
             />
-          </div>
+            <FormField
+              control={form.control}
+              name="memo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>メモ</FormLabel>
+                  <FormControl>
+                    <Textarea disabled={pending} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </section>
           <section
             aria-labelledby="meter-reading-items-heading"
-            className="flex flex-col gap-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+            className="flex flex-col gap-2 lg:col-start-2 lg:row-start-1"
           >
             <h2 id="meter-reading-items-heading" className="text-sm font-bold">
-              内訳
+              <button
+                type="button"
+                className="flex w-full items-center justify-between text-left"
+                aria-expanded={itemsExpanded}
+                aria-controls="meter-reading-items-body"
+                onClick={() => setItemsOpen(!itemsExpanded)}
+              >
+                料金の内訳（任意）
+                <ChevronDownIcon
+                  aria-hidden
+                  className={`size-4 text-muted-foreground transition-transform ${itemsExpanded ? "rotate-180" : ""}`}
+                />
+              </button>
             </h2>
-            <MeterReadingItemsSection
-              control={form.control}
-              fields={itemsArray.fields}
-              hasContract={contractId !== ""}
-              disabled={pending}
-            />
-            {/* 画面の操作では起きないが、内訳の一覧の入力チェックに通らなかったときの文言をここに出す。 */}
-            {form.formState.errors.items?.message && (
-              <p className="text-xs text-destructive">{form.formState.errors.items.message}</p>
-            )}
+            {/* 閉じている間も入力欄は画面に残す（hidden）ので、入力済みの値は消えない。 */}
+            <div
+              id="meter-reading-items-body"
+              hidden={!itemsExpanded}
+              className="flex flex-col gap-2"
+            >
+              <MeterReadingItemsSection
+                control={form.control}
+                fields={itemsArray.fields}
+                hasContract={contractId !== ""}
+                disabled={pending}
+              />
+              {/* 画面の操作では起きないが、内訳の一覧の入力チェックに通らなかったときの文言をここに出す。 */}
+              {form.formState.errors.items?.message && (
+                <p className="text-xs text-destructive">{form.formState.errors.items.message}</p>
+              )}
+            </div>
           </section>
-          <FormField
-            control={form.control}
-            name="memo"
-            render={({ field }) => (
-              <FormItem className="lg:col-start-1 lg:row-start-2">
-                <FormLabel>メモ</FormLabel>
-                <FormControl>
-                  <Textarea disabled={pending} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
         {/* 契約を選び直すと入力した内訳が消えるため、内訳に入力済みの値があるときだけ確認する。 */}
         <AlertDialog
