@@ -44,6 +44,14 @@ export async function findMeterReadingsForHome(householdId: string) {
   });
 }
 
+// 世帯のすべての検針票を、グラフの計算に使う列だけ取り出す。ホームと同じく、年に 30 件ほどなので絞り込まずにすべて読む。
+export async function findMeterReadingsForGraphs(householdId: string) {
+  return prisma.meterReading.findMany({
+    where: { householdId },
+    select: { utilityType: true, usageMonth: true, amount: true, usage: true },
+  });
+}
+
 // 世帯の同じ種別・同じ使用月の検針票の ID を返す。無ければ null。1 件の制約の確かめと、作成から編集への切り替えに使う。
 export async function findMeterReadingIdByMonth(
   householdId: string,

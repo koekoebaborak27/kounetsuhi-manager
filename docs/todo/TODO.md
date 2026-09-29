@@ -53,7 +53,9 @@ git status --porcelain   # 未コミット差分がないか確認
     - [x] ② S08 の内訳項目（候補から追加・その他・外す・並べ替え・ひな形・種別を変えるときの確認）（2026-09-29）→ [履歴](history/2026-09-w4.md#2026-09-29-契約の内訳項目の選択と並べ替えを作成)
   - [x] 5-6. 検針票の記録（2026-09-29。S05 記録と S04 検針票の入力を 1 つの PR にまとめた）→ [`03_検針票の記録`](../specs/02_basic-design/03_検針票の記録/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-検針票のs05記録とs04入力を作成)
   - [x] 5-7. ホーム（2026-09-29。1 つの PR にまとめた）→ [`04_ホーム`](../specs/02_basic-design/04_ホーム/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-ホームs03を作成)
-  - [ ] 5-8. グラフ → [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)
+  - [ ] 5-8. グラフ → [`05_グラフ`](../specs/02_basic-design/05_グラフ/README.md)。タスクを 2 つに分け、それぞれ 1 つの PR にする
+    - [x] ① Recharts の導入・共通部分（タブの枠・水道の区切り・検針票の読み出し）・推移タブ（2026-09-29）→ [履歴](history/2026-09-w5.md#2026-09-29-グラフの推移タブs06を作成)
+    - [ ] ② 年比較タブ・年間タブ
 - [ ] 6. 画面テスト（必要かどうかを判断する。必要な場合は [`create-unit-test-spec`](../skills/create-unit-test-spec.md) でテスト仕様書を作成したうえで [`playwright-evidence-test`](../skills/playwright-evidence-test.md) を行う）
 - [ ] 7. ユーザテスト（必要かどうかを判断する）
 
@@ -71,8 +73,8 @@ git status --porcelain   # 未コミット差分がないか確認
 
 | 項目 | 状態 |
 | --- | --- |
-| 作業ブランチ | `main`（5-7 まで完了。5-8 はまだ始めていない）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
-| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
+| 作業ブランチ | `feature/graphs`（5-8 ① の PR 待ち。`main` は 5-7 まで）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
+| ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる（年比較・年間のタブは「準備中」）。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
 | 本番 | 未構築 |
 
 ## 完了済みの作業
