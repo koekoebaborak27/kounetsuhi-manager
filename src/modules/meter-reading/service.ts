@@ -180,6 +180,7 @@ export async function getRecordsMonth(
   });
   return {
     month,
+    maxMonth: usageMonthMax(currentMonth),
     prevMonth: month > USAGE_MONTH_MIN ? prevMonth : null,
     nextMonth: month < usageMonthMax(currentMonth) ? addMonths(month, 1) : null,
     rows,

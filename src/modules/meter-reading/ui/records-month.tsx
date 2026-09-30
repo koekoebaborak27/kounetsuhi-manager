@@ -3,13 +3,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { splitYearMonth } from "@/shared/date/year-month";
 import { formatYen } from "@/shared/format/amount";
 import { Button } from "@/shared/ui/button";
 import { formatUsageMonth } from "@/shared/ui/usage-month";
 import { UtilityDot, UTILITY_TYPE_LABELS } from "@/shared/ui/utility-dot";
 import { editMeterReadingHref, newMeterReadingHref, recordsHref } from "../reading-rules";
 import type { RecordsMonthView, RecordsRow } from "../types";
+import { RecordsMonthPicker } from "./records-month-picker";
 
 // 前後の月へ移るボタン。範囲の外で移れないときは、押せないボタンだけを置く。
 function MonthLink({
@@ -80,16 +80,14 @@ function RecordsRowItem({ row, month }: { row: RecordsRow; month: string }) {
 
 // S05 記録の中身。行が少ないため、PC でも幅を 640px 程度に収める。
 export function RecordsMonth({ view }: { view: RecordsMonthView }) {
-  const { year, month } = splitYearMonth(view.month);
   return (
     <main className="px-4 py-4 lg:max-w-2xl lg:px-7">
       <nav aria-label="表示する月" className="mb-4 flex items-center justify-center gap-5">
         <MonthLink month={view.prevMonth} label="前の月">
           <ChevronLeft aria-hidden />
         </MonthLink>
-        <h2 className="text-base font-bold" aria-live="polite">
-          {year} 年 {month} 月分
-        </h2>
+        {/* 見出しを押すと年月を選べる。前後のボタンでは遠い月へ移るのが大変なため。 */}
+        <RecordsMonthPicker month={view.month} maxMonth={view.maxMonth} />
         <MonthLink month={view.nextMonth} label="次の月">
           <ChevronRight aria-hidden />
         </MonthLink>
