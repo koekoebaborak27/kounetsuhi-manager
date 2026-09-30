@@ -61,10 +61,10 @@ git status --porcelain   # 未コミット差分がないか確認
 - [ ] 8. 本番構築（手順書は [`docs/specs/99_infra/`](../specs/99_infra/README.md) に手順ごとに分けて残す。実際の値は書かない）
   - [x] 8-1. 構成と手順の設計（2026-09-29。00 概要と全体構成・01 事前準備と環境変数の対応表を書き、02〜05 は章立てまで）→ [`99_infra`](../specs/99_infra/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-本番構築の構成と手順を設計)
   - [x] 8-2. 本番用 DB を作った（2026-09-30。無料プロジェクトの上限のため、別アプリのプロジェクトに専用スキーマ `kounetsuhi_manager` と専用ロールを作って同居。`migrate deploy` で 3 件を適用し、`_prisma_migrations` の行数と一致）→ [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md)・[履歴](history/2026-09-w5.md#2026-09-30-本番用-db-を作成)
-  - [ ] 8-3. Google ログインの本番設定（Google Cloud の OAuth クライアントに本番 URL のリダイレクト先を追加し、同意画面のテストユーザーに家族を登録する）
+  - [x] 8-3. Google ログインの本番設定（2026-09-30。Vercel のプロジェクトだけ先に作って URL を確定し、開発用の OAuth クライアントに本番の URL を足した。同意画面は「テスト」・家族登録済みを確認）→ [`03_Googleログイン`](../specs/99_infra/infra_design_03_Googleログイン.md)・[履歴](history/2026-09-w5.md#2026-09-30-google-ログインの本番設定)
   - [x] 8-A. 【8-4 の前に】Vercel Cron 用の URL を実装した（2026-09-29。`/api/cron/keepalive`・`vercel.json` の `crons`。設計は [`00_全体共通.md`](../specs/02_basic-design/00_全体共通.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-vercel-cron-用の-url-を実装)
   - [x] 8-C. 【8-4 の前に】`src/shared/db/client.ts` で専用スキーマ（環境変数 `DATABASE_SCHEMA`）を `PrismaPg` に渡すようにした（2026-09-30。設計は [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md#アプリ側の宿題8-4-の前に別-pr-で行う)）→ [履歴](history/2026-09-w5.md#2026-09-30-専用スキーマをアプリの接続に渡す)
-  - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（リポジトリを連携し、`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
+  - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（プロジェクトの作成・リポジトリの連携は 8-3 で済み。**環境変数を入れる前に Vercel の 2 段階認証を設定し、GitHub アプリの許可範囲を絞る**。`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
   - [x] 8-B. 【8-5 の前に】PWA の manifest とアイコンを実装した（2026-09-29。`src/app/manifest.ts`・`public/icons/`。要件は [`01_全体要件.md`](../specs/01_requirements/00_全体/01_全体要件.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-pwa-の-manifest-とアイコンを実装)
   - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）
   - [ ] 8-6. 本番の運用の取り決め（DB のバックアップ方法、無料プランの制限、障害時の連絡・戻し方）を `99_infra` に書き、README の「本番デプロイ」を実際の手順に合わせる
@@ -87,7 +87,7 @@ git status --porcelain   # 未コミット差分がないか確認
 | --- | --- |
 | 作業ブランチ | `main`（5-8 ② まで完了。開発工程 5 は終了。その後 #15 で S04 の使用期間の必須化と入力欄の整理を反映）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
 | ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる。年比較タブで今年・前年・前々年の折れ線を種別・金額 / 使用量で比べ、年間タブで今年の合計・前年比・月平均と年ごとの合計の表を確かめられる。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
-| 本番 | DB のみ構築（Supabase の専用スキーマにマイグレーション 3 件を適用済み）。アプリ（Vercel）・Google ログインは未構築 |
+| 本番 | DB（Supabase の専用スキーマにマイグレーション 3 件を適用済み）と Google の承認済み URI の登録は済み。Vercel はプロジェクトだけ作成済みで、環境変数の設定・デプロイは未実施（ビルドは失敗する状態） |
 
 ## 完了済みの作業
 
