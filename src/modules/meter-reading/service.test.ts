@@ -189,6 +189,8 @@ describe("meter-reading/service", () => {
       const last = await getRecordsMonth(membership, "2026-10");
       expect(last.nextMonth).toBeNull();
       expect(last.prevMonth).toBe("2026-09");
+      // 月を選ぶ小窓で選べる最後の月は、次の月へ移れる上限と同じ。
+      expect(last.maxMonth).toBe("2026-10");
     });
   });
 

@@ -11,9 +11,10 @@ export type RecordsRow = {
   bimonthlySkip: boolean;
 };
 
-// S05 記録に表示する月と、種別ごとの行。前後の月が範囲の外なら null。
+// S05 記録に表示する月と、種別ごとの行。前後の月が範囲の外なら null。maxMonth は月を選ぶ小窓で選べる最後の月。
 export type RecordsMonthView = {
   month: string;
+  maxMonth: string;
   prevMonth: string | null;
   nextMonth: string | null;
   rows: RecordsRow[];
