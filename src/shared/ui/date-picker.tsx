@@ -1,6 +1,7 @@
 "use client";
 // 日付を選ぶ欄。押すとカレンダーを開き、選んだ日を YYYY-MM-DD の文字列で返す。
 // 契約の開始日・終了日と、検針票の使用期間で同じ見た目にするため、共通部品にしている。
+import { useState } from "react";
 import { CalendarIcon, X } from "lucide-react";
 import { ja } from "react-day-picker/locale";
 import { dateOnlyToLocalDate, formatDateOnly, localDateToDateOnly } from "@/shared/date/date-only";
@@ -31,11 +32,13 @@ export function DatePicker({
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
 }) {
+  // カレンダーの小窓を開いているかどうか。日付を選んだら閉じるために自分で持つ。
+  const [open, setOpen] = useState(false);
   const startMonth = new Date(yearRange.from, 0, 1);
   const endMonth = new Date(yearRange.to, 11, 1);
   return (
     <div className="flex gap-1">
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             id={id}
@@ -57,7 +60,11 @@ export function DatePicker({
             mode="single"
             selected={value ? dateOnlyToLocalDate(value) : undefined}
             defaultMonth={value ? dateOnlyToLocalDate(value) : undefined}
-            onSelect={(date) => date && onChange(localDateToDateOnly(date))}
+            onSelect={(date) => {
+              // 同じ日をもう一度押すと date が空で渡ってくる。その場合は値を変えず、小窓だけ閉じる。
+              if (date) onChange(localDateToDateOnly(date));
+              setOpen(false);
+            }}
             captionLayout="dropdown"
             startMonth={startMonth}
             endMonth={endMonth}
