@@ -18,7 +18,7 @@ Next.js アプリを Vercel（Hobby プラン）にデプロイする。**この
    - **ビルドでマイグレーションは実行しない**
 3. 関数のリージョンを東京（`hnd1`）にする
 4. 環境変数を設定する
-   - [01 の 4](infra_design_01_事前準備.md#4-環境変数の対応表) の表のとおり、**Production だけ**に設定する。`DATABASE_URL` は Transaction モードの文字列
+   - [01 の 4](infra_design_01_事前準備.md#4-環境変数の対応表) の表のとおり、**Production だけ**に設定する。`DATABASE_SCHEMA`（`kounetsuhi_manager`）も忘れずに設定する。`DATABASE_URL` は Transaction モードの文字列
    - 値の入力は本人が管理画面で行う（チャット・コードに書かない）
 5. デプロイして、ビルドが通ることを確認する
    - `main` への push で自動デプロイされること
