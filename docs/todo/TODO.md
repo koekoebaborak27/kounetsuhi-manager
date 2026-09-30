@@ -66,7 +66,7 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] 8-C. 【8-4 の前に】`src/shared/db/client.ts` で専用スキーマ（環境変数 `DATABASE_SCHEMA`）を `PrismaPg` に渡すようにした（2026-09-30。設計は [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md#アプリ側の宿題8-4-の前に別-pr-で行う)）→ [履歴](history/2026-09-w5.md#2026-09-30-専用スキーマをアプリの接続に渡す)
   - [x] 8-4. Vercel（Hobby プラン）にデプロイした（2026-09-30。Build Command で Prisma のコード生成、Node.js 22.x、関数は東京、環境変数 7 つは Production だけ。GitHub アプリは全リポジトリのまま、Vercel 側の 2 段階認証は GitHub 側で保護するため設定しない判断。ビルド成功・Cron は認証なし 401 / ありで 200）→ [`04_Vercel`](../specs/99_infra/infra_design_04_Vercel.md)・[履歴](history/2026-09-w5.md#2026-09-30-vercel-にデプロイ)
   - [x] 8-B. 【8-5 の前に】PWA の manifest とアイコンを実装した（2026-09-29。`src/app/manifest.ts`・`public/icons/`。要件は [`01_全体要件.md`](../specs/01_requirements/00_全体/01_全体要件.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-pwa-の-manifest-とアイコンを実装)
-  - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）
+  - [x] 8-5. 本番の動作確認をした（2026-09-30。Google ログイン → 世帯の作成 → 契約・検針票の登録 → ホーム・グラフ → ログアウトと再ログイン → Android の Chrome での PWA の追加まで成功。実データで確認したため、そのまま運用に移れる。2 人目の参加とテストユーザー以外の拒否は、確認用のアカウントが無く省略）→ [`05_動作確認と運用`](../specs/99_infra/infra_design_05_動作確認と運用.md)・[履歴](history/2026-09-w5.md#2026-09-30-本番の動作確認)
   - [ ] 8-6. 本番の運用の取り決め（DB のバックアップ方法、無料プランの制限、障害時の連絡・戻し方）を `99_infra` に書き、README の「本番デプロイ」を実際の手順に合わせる
 
 ## 残っているタスク
@@ -87,7 +87,7 @@ git status --porcelain   # 未コミット差分がないか確認
 | --- | --- |
 | 作業ブランチ | `main`（5-8 ② まで完了。開発工程 5 は終了。その後 #15 で S04 の使用期間の必須化と入力欄の整理を反映）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
 | ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる。年比較タブで今年・前年・前々年の折れ線を種別・金額 / 使用量で比べ、年間タブで今年の合計・前年比・月平均と年ごとの合計の表を確かめられる。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
-| 本番 | DB（Supabase の専用スキーマにマイグレーション 3 件を適用済み）、Google の承認済み URI の登録、Vercel へのデプロイ（環境変数 7 つ・東京リージョン・Cron 登録）は済み。Cron 用の URL は認証つきで成功する。Google ログインなど画面の動作確認は未実施（8-5） |
+| 本番 | DB（Supabase の専用スキーマにマイグレーション 3 件を適用済み）、Google の承認済み URI の登録、Vercel へのデプロイ（環境変数 7 つ・東京リージョン・Cron 登録）は済み。Cron 用の URL は認証つきで成功する。画面の動作確認（ログイン・世帯・契約・検針票・ホーム・グラフ・PWA）は済み。2 人目の参加とテストユーザー以外の拒否は未確認 |
 
 ## 完了済みの作業
 

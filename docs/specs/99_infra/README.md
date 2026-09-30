@@ -13,9 +13,9 @@
 | [`infra_design_02_Supabase.md`](infra_design_02_Supabase.md) | 本番 DB の作成とマイグレーション（別アプリと同居する専用スキーマ構成） | 8-2 | 完成 |
 | [`infra_design_03_Googleログイン.md`](infra_design_03_Googleログイン.md) | OAuth クライアント・リダイレクト先・テストユーザー | 8-3 | 完成 |
 | [`infra_design_04_Vercel.md`](infra_design_04_Vercel.md) | デプロイ・環境変数・リージョン・Cron | 8-3・8-4 | 完成 |
-| [`infra_design_05_動作確認と運用.md`](infra_design_05_動作確認と運用.md) | 本番の動作確認・運用の取り決め | 8-5・8-6 | 章立てのみ |
+| [`infra_design_05_動作確認と運用.md`](infra_design_05_動作確認と運用.md) | 本番の動作確認・運用の取り決め | 8-5・8-6 | A（8-5）は完成、B（8-6）は章立てのみ |
 
-「章立てのみ」は、実際に操作するタスクで、画面のボタン名までの手順を書き足す。
+「章立てのみ」（05 の B）は、実際に操作するタスクで、画面のボタン名までの手順を書き足す。
 
 ## 書くときの注意
 
