@@ -11,8 +11,14 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 // Prisma のクライアントを新しく作る。
 // Prisma 7 では、PostgreSQL へは @prisma/adapter-pg を通してつなぐ。接続先は環境変数 DATABASE_URL を使う。
+// 使うスキーマ（DB の中の区画）は環境変数 DATABASE_SCHEMA で決める。
+// 接続文字列の ?schema= は、この接続方法では読まれないため、ここで別に渡す必要がある。
+// 未設定・空文字のときは undefined を渡し、標準の public を使う（開発用 DB はこれ）。
 function createPrismaClient(): PrismaClient {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const adapter = new PrismaPg(
+    { connectionString: process.env.DATABASE_URL },
+    { schema: process.env.DATABASE_SCHEMA || undefined },
+  );
   return new PrismaClient({ adapter });
 }
 

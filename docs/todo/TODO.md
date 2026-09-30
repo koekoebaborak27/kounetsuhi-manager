@@ -63,7 +63,7 @@ git status --porcelain   # 未コミット差分がないか確認
   - [x] 8-2. 本番用 DB を作った（2026-09-30。無料プロジェクトの上限のため、別アプリのプロジェクトに専用スキーマ `kounetsuhi_manager` と専用ロールを作って同居。`migrate deploy` で 3 件を適用し、`_prisma_migrations` の行数と一致）→ [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md)・[履歴](history/2026-09-w5.md#2026-09-30-本番用-db-を作成)
   - [ ] 8-3. Google ログインの本番設定（Google Cloud の OAuth クライアントに本番 URL のリダイレクト先を追加し、同意画面のテストユーザーに家族を登録する）
   - [x] 8-A. 【8-4 の前に】Vercel Cron 用の URL を実装した（2026-09-29。`/api/cron/keepalive`・`vercel.json` の `crons`。設計は [`00_全体共通.md`](../specs/02_basic-design/00_全体共通.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-vercel-cron-用の-url-を実装)
-  - [ ] 8-C. 【8-4 の前に】`src/shared/db/client.ts` で専用スキーマ（環境変数 `DATABASE_SCHEMA`）を `PrismaPg` に渡す。`?schema=` はアプリの接続では無視されるため（別 PR。設計は [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md#アプリ側の宿題8-4-の前に別-pr-で行う)）
+  - [x] 8-C. 【8-4 の前に】`src/shared/db/client.ts` で専用スキーマ（環境変数 `DATABASE_SCHEMA`）を `PrismaPg` に渡すようにした（2026-09-30。設計は [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md#アプリ側の宿題8-4-の前に別-pr-で行う)）→ [履歴](history/2026-09-w5.md#2026-09-30-専用スキーマをアプリの接続に渡す)
   - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（リポジトリを連携し、`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
   - [x] 8-B. 【8-5 の前に】PWA の manifest とアイコンを実装した（2026-09-29。`src/app/manifest.ts`・`public/icons/`。要件は [`01_全体要件.md`](../specs/01_requirements/00_全体/01_全体要件.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-pwa-の-manifest-とアイコンを実装)
   - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）

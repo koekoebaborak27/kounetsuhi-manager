@@ -39,6 +39,7 @@ Vercel CLI・Supabase CLI は使わない（管理画面と Git 連携だけで�
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | DB への接続文字列 | 手元の Docker の PostgreSQL（`.env`） | Supabase の接続プーラー（**Transaction モード**、ポート 6543）の文字列。ユーザーは専用ロール `app_kounetsuhi_manager.<プロジェクトID>`（[02](infra_design_02_Supabase.md)） | Vercel（Production） |
 | `DATABASE_URL`（マイグレーション用） | `prisma migrate deploy` が読む接続先 | — | Supabase の接続プーラー（**Session モード**、ポート 5432）の文字列。専用ロールで、末尾に `?schema=kounetsuhi_manager` | 手元のシェルだけ（一時的に設定し、終わったら消す。Vercel には入れない） |
+| `DATABASE_SCHEMA` | アプリが使う DB のスキーマ名。接続文字列の `?schema=` はアプリの接続では読まれないため、別に渡す（実装済み: 8-C） | 未設定（空）。`public` を使う | `kounetsuhi_manager`（[02](infra_design_02_Supabase.md)） | Vercel（Production） |
 | `BETTER_AUTH_SECRET` | ログイン状態を守る秘密の値 | `.env` に自分で生成した値 | 本番用に**別の**値を生成 | Vercel（Production） |
 | `BETTER_AUTH_URL` | アプリの URL。Google から戻ってくる先の URL を作るのに使う | `http://localhost:3000` | `https://<プロジェクト名>.vercel.app` | Vercel（Production） |
 | `GOOGLE_CLIENT_ID` | Google の OAuth クライアントの ID | 開発用クライアントの値 | 本番用（または本番の URL を足したクライアント）の値 | Vercel（Production） |

@@ -212,7 +212,7 @@ Remove-Item Env:DATABASE_URL; $s = $null; $u = $null
 
 ## アプリ側の宿題（8-4 の前に別 PR で行う）
 
-`src/shared/db/client.ts` は `new PrismaPg({ connectionString })` で接続しており、この形では接続文字列の `?schema=` が**無視される**（`prisma migrate deploy` は読む）。専用スキーマを使うには、スキーマ名を渡す修正が要る。環境変数 `DATABASE_SCHEMA` で渡す案（本番だけ `kounetsuhi_manager`、開発は未設定で `public`）で、TODO に別タスクとして追加してある。**この修正が済むまで 8-4（デプロイ）へ進まない。**
+アプリの接続（`src/shared/db/client.ts`、`@prisma/adapter-pg` 経由）は、接続文字列の `?schema=` を**読まない**（`prisma migrate deploy` は読む）。そこで環境変数 `DATABASE_SCHEMA` を `new PrismaPg(..., { schema })` へ渡すようにした（8-C で実装済み）。本番（Vercel の Production）だけ `kounetsuhi_manager` を設定し、開発は未設定（空）で `public` を使う。**設定を忘れると、アプリは `public`（別アプリのテーブルがある側）を見に行き、テーブルが見つからずエラーになる**（別アプリのテーブルを書き換えることは、専用ロールに権限が無いためできない）。実際に本番の DB から読めるかは 8-4・8-5 で確かめる。
 
 ## 注意
 
