@@ -60,9 +60,10 @@ git status --porcelain   # 未コミット差分がないか確認
 - [ ] 7. 【後回し】ユーザテスト（必要かどうかを判断する）
 - [ ] 8. 本番構築（手順書は [`docs/specs/99_infra/`](../specs/99_infra/README.md) に手順ごとに分けて残す。実際の値は書かない）
   - [x] 8-1. 構成と手順の設計（2026-09-29。00 概要と全体構成・01 事前準備と環境変数の対応表を書き、02〜05 は章立てまで）→ [`99_infra`](../specs/99_infra/README.md)・[履歴](history/2026-09-w5.md#2026-09-29-本番構築の構成と手順を設計)
-  - [ ] 8-2. 本番用 DB を作る（Supabase の無料プランでプロジェクトを作成し、接続文字列を控える。`prisma migrate deploy` で本番 DB へマイグレーションを流す）
+  - [x] 8-2. 本番用 DB を作った（2026-09-30。無料プロジェクトの上限のため、別アプリのプロジェクトに専用スキーマ `kounetsuhi_manager` と専用ロールを作って同居。`migrate deploy` で 3 件を適用し、`_prisma_migrations` の行数と一致）→ [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md)・[履歴](history/2026-09-w5.md#2026-09-30-本番用-db-を作成)
   - [ ] 8-3. Google ログインの本番設定（Google Cloud の OAuth クライアントに本番 URL のリダイレクト先を追加し、同意画面のテストユーザーに家族を登録する）
   - [x] 8-A. 【8-4 の前に】Vercel Cron 用の URL を実装した（2026-09-29。`/api/cron/keepalive`・`vercel.json` の `crons`。設計は [`00_全体共通.md`](../specs/02_basic-design/00_全体共通.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-vercel-cron-用の-url-を実装)
+  - [ ] 8-C. 【8-4 の前に】`src/shared/db/client.ts` で専用スキーマ（環境変数 `DATABASE_SCHEMA`）を `PrismaPg` に渡す。`?schema=` はアプリの接続では無視されるため（別 PR。設計は [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md#アプリ側の宿題8-4-の前に別-pr-で行う)）
   - [ ] 8-4. Vercel（Hobby プラン）にデプロイする（リポジトリを連携し、`DATABASE_URL`・`BETTER_AUTH_SECRET`・`BETTER_AUTH_URL`・`GOOGLE_CLIENT_ID`・`GOOGLE_CLIENT_SECRET` を環境変数に設定する。ビルドが通ることを確認する）
   - [x] 8-B. 【8-5 の前に】PWA の manifest とアイコンを実装した（2026-09-29。`src/app/manifest.ts`・`public/icons/`。要件は [`01_全体要件.md`](../specs/01_requirements/00_全体/01_全体要件.md)）→ [履歴](history/2026-09-w5.md#2026-09-29-pwa-の-manifest-とアイコンを実装)
   - [ ] 8-5. 本番の動作確認（Google ログイン → 世帯の作成・招待 → 契約・検針票の登録 → ホーム・グラフの表示。スマホでの PWA のインストールを含む）
@@ -76,6 +77,8 @@ git status --porcelain   # 未コミット差分がないか確認
 - [ ] ジョブ用の入口ラッパー（`src/shared/observability`）を作る。定期処理は Vercel Cron が API を呼ぶ形で API 用ラッパーで足りるため、ジョブの仕組みを使う場面が出たときに作る → [履歴](history/2026-09.md#2026-09-28-共通部品のdb接続とエラーと入口のラッパーを作成)
 - [ ] 契約の保存で、検針票の有無による種別変更の可否と、内訳項目の作る・戻す・外す・表示順の振り直しを DB を使う統合テスト（`*.int.test.ts`）で確かめる。検針票の保存（1 つのトランザクションでの作成・内訳の作り直し・同時保存で一意の条件に当たったときの置き換え）もあわせて確かめる。テスト用 DB・`pnpm test` からの除外・CI への PostgreSQL の追加を決めてから作る。振り分けは純粋関数と service の単体テストで確かめた → [履歴](history/2026-09-w4.md#2026-09-28-契約の一覧と基本項目の登録編集を作成)・[履歴](history/2026-09-w4.md#2026-09-29-契約の内訳項目の選択と並べ替えを作成)・[履歴](history/2026-09-w5.md#2026-09-29-検針票のs05記録とs04入力を作成)
 
+- [ ] 別アプリ（food-stock-manager）のテーブルを、`public` から専用スキーマへ移すか判断する。移す場合は、そのアプリ側で接続設定・`_prisma_migrations`・戻し方・事前のバックアップ（CSV の書き出し）を含めて計画する（本アプリの DB 作成では触っていない）→ [`02_Supabase`](../specs/99_infra/infra_design_02_Supabase.md)
+
 ## 現在の状態
 
 事実のみ。予定・経緯・仕様は書かない。
@@ -84,7 +87,7 @@ git status --porcelain   # 未コミット差分がないか確認
 | --- | --- |
 | 作業ブランチ | `main`（5-8 ② まで完了。開発工程 5 は終了。その後 #15 で S04 の使用期間の必須化と入力欄の整理を反映）。既定も `main`（[koekoebaborak27/kounetsuhi-manager](https://github.com/koekoebaborak27/kounetsuhi-manager)、public。ブランチ保護なし）。確認は `git log --oneline -1` |
 | ローカル環境 | 開発用 DB（Docker の PostgreSQL 17）と Next.js 16（タブで切り替える画面）、Tailwind CSS v4・shadcn/ui・Prisma 7.10・Recharts 3.10。S07 設定で世帯と契約の一覧、S08（`/settings/contracts/new`・`/settings/contracts/[id]`）で契約の基本項目と内訳項目（ひな形・候補・その他・並べ替え・外す）を登録・編集でき、契約を削除できる。検針票がある契約は削除できない。S06 グラフ（`/graphs`）の推移タブで、12・24 か月の請求額（すべては積み上げ、種別を選ぶと使用量の折れ線つき）と選んだ月の内訳を確かめられる。年比較タブで今年・前年・前々年の折れ線を種別・金額 / 使用量で比べ、年間タブで今年の合計・前年比・月平均と年ごとの合計の表を確かめられる。S03 ホーム（`/`）で今年の合計と、種別ごとの最新の検針票・前回比・前年同月比・1 日あたりの金額・「次月分を作成」を確かめ、S05（`/records`）で月を切り替えて検針票の登録状況を確かめ、S04（`/records/new`・`/records/[id]`）で検針票の基本の項目と内訳を作成・編集・削除できる。ログインを試すには `.env` に Google の OAuth クライアントの値が要る（[手順](../development/Googleログインの準備.md)） |
-| 本番 | 未構築 |
+| 本番 | DB のみ構築（Supabase の専用スキーマにマイグレーション 3 件を適用済み）。アプリ（Vercel）・Google ログインは未構築 |
 
 ## 完了済みの作業
 

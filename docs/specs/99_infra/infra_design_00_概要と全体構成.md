@@ -50,6 +50,7 @@ flowchart LR
 | マイグレーション | `prisma migrate deploy` を**手元から手動で**実行する。Vercel のビルドでは実行しない。詳細は 6 | 本番 DB を書き換える操作を、人が見ている場面でだけ行うため（[`prisma_operations.md`](../../prisma_operations.md) の 3） |
 | デプロイのきっかけ | `main` への push で Vercel が自動デプロイする | Vercel の標準の動き。docs だけの変更でも再デプロイが走ることは許容する |
 | Vercel の環境ごとの設定 | 環境変数は **Production にだけ**設定する。Preview（PR ごとの試し用デプロイ）には本番 DB・Google の値を設定しない | Preview から本番 DB を誤って書き換えないため。Preview の URL は PR ごとに変わり、Google のリダイレクト先にも登録できない。CI が別にビルドを確かめているので、Preview はビルドの確認にとどめる |
+| DB の置き場所（8-2 で変更） | 別アプリの Supabase プロジェクトに同居し、本アプリ専用のスキーマ `kounetsuhi_manager` とロール `app_kounetsuhi_manager` を使う。接続文字列の末尾に `?schema=kounetsuhi_manager` を付けてマイグレーションを流す。アプリ側は `client.ts` でスキーマ名を渡す修正が要る（8-4 の前に実施）。詳細は [02](infra_design_02_Supabase.md) | 無料プロジェクトの上限（2 個）に達していたため |
 | バックアップ | 機能としては作らない。必要なときに Supabase の管理画面からテーブルを CSV で書き出す（[要件](../01_requirements/00_全体/01_全体要件.md)） | 要件どおり |
 | Supabase の一時停止の防止 | Vercel Cron が 1 日 1 回、アプリの専用の URL を呼び、アプリが DB へ `SELECT 1` を送る（[設計](../02_basic-design/00_全体共通.md)） | 無料プランの一時停止を避けるため |
 

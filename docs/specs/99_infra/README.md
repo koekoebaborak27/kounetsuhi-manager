@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | [`infra_design_00_概要と全体構成.md`](infra_design_00_概要と全体構成.md) | 全体構成図・各サービスの役割と無料枠・決めた方針・DB 接続の考え方・マイグレーション方針 | 8-1 | 完成 |
 | [`infra_design_01_事前準備.md`](infra_design_01_事前準備.md) | 必要なアカウント・ツール・環境変数の対応表 | 8-1 | 完成 |
-| [`infra_design_02_Supabase.md`](infra_design_02_Supabase.md) | 本番 DB の作成とマイグレーション | 8-2 | 章立てのみ |
+| [`infra_design_02_Supabase.md`](infra_design_02_Supabase.md) | 本番 DB の作成とマイグレーション（別アプリと同居する専用スキーマ構成） | 8-2 | 完成 |
 | [`infra_design_03_Googleログイン.md`](infra_design_03_Googleログイン.md) | OAuth クライアント・リダイレクト先・テストユーザー | 8-3 | 章立てのみ |
 | [`infra_design_04_Vercel.md`](infra_design_04_Vercel.md) | デプロイ・環境変数・リージョン・Cron | 8-4 | 章立てのみ |
 | [`infra_design_05_動作確認と運用.md`](infra_design_05_動作確認と運用.md) | 本番の動作確認・運用の取り決め | 8-5・8-6 | 章立てのみ |
