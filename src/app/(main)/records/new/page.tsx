@@ -37,7 +37,11 @@ export default async function Page({
   return (
     <>
       <PageTitle>検針票の入力</PageTitle>
-      <MeterReadingForm data={result.data} />
+      {/* フォームは初期値を最初の表示時にしか読まないので、種別・使用月が変わったら key で作り直して新しい初期値を使わせる。 */}
+      <MeterReadingForm
+        key={`${result.data.utilityType}-${result.data.values.usageMonth}`}
+        data={result.data}
+      />
     </>
   );
 }
